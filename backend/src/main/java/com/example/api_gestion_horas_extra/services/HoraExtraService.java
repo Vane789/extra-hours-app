@@ -1,7 +1,7 @@
-package com.example.api_gestion_horas_extra.Service;
+package com.example.api_gestion_horas_extra.services;
 
-import com.example.api_gestion_horas_extra.Model.HoraExtra;
-import com.example.api_gestion_horas_extra.Repository.HoraExtraRepository;
+import com.example.api_gestion_horas_extra.models.HoraExtra;
+import com.example.api_gestion_horas_extra.repositories.HoraExtraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

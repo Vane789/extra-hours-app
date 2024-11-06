@@ -1,4 +1,4 @@
-package com.example.api_gestion_horas_extra.Controller;
+package com.example.api_gestion_horas_extra.controllers;
 
 import com.example.api_gestion_horas_extra.Model.HoraExtra;
 import com.example.api_gestion_horas_extra.Service.HoraExtraService;

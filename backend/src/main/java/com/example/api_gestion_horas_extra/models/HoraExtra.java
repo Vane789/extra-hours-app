@@ -1,4 +1,4 @@
-package com.example.api_gestion_horas_extra.Model;
+package com.example.api_gestion_horas_extra.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
