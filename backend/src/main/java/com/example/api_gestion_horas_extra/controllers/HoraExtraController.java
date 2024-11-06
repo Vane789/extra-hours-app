@@ -1,7 +1,7 @@
 package com.example.api_gestion_horas_extra.controllers;
 
-import com.example.api_gestion_horas_extra.Model.HoraExtra;
-import com.example.api_gestion_horas_extra.Service.HoraExtraService;
+import com.example.api_gestion_horas_extra.models.HoraExtra;
+import com.example.api_gestion_horas_extra.services.HoraExtraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
