@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
 import { useAuth } from "../utils/AuthContext";
 import "./LoginPage.scss";
+import usuario from "../assets/images/usuario.png";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -62,7 +63,8 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
+     <img className="logousuario" src={usuario} alt="usuario" />
+     
       <Form name="login-form" onFinish={handleLogin} layout="vertical">
         <Form.Item
           label="Usuario"
