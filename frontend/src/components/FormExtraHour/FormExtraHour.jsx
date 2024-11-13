@@ -187,7 +187,7 @@ export const FormExtraHour = () => {
         <label className="observations" htmlFor="observations">
           {" "}
           <br />
-          <p className="observations"> Observacione</p>
+          <h3 className="observations"> Observacione</h3>
         </label>
         <textarea
           id="observations"
