@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../utils/AuthContext";
+import { useContext } from 'react';
+import { AuthContext } from './context/AuthContext';
 import "./ExtraHoursMenu.scss";
 import Pagar from "../assets/images/Pagar.png";
 import Agregar from "../assets/images/Agregar.png";
@@ -10,77 +11,67 @@ import NominaAprobar from "../assets/images/NominaAprobar.png";
 
 const ExtraHoursMenu = () => {
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const { auth, isAdmin, isUser } = useContext(AuthContext);
 
-  // Mostrar las opciones según el rol
+  const MENU_ITEMS = {
+    USER: [
+      {
+        icon: Agregar,
+        text: "Agregar",
+        path: "/add",
+        id: "imgagregar"
+      }
+    ],
+    ADMIN: [
+      {
+        icon: Agregar,
+        text: "Agregar",
+        path: "/add",
+        id: "imgagregar"
+      },
+      {
+        icon: Eliminar,
+        text: "Actualizar - Eliminar",
+        path: "/delete"
+      },
+      {
+        icon: Informes,
+        text: "Informes",
+        path: "/reports"
+      },
+      {
+        icon: NominaAprobar,
+        text: "Nómina - Aprobar",
+        path: "/approve-payroll"
+      },
+      {
+        icon: Pagar,
+        text: "Pagar",
+        path: "/update"
+      },
+      {
+        icon: Configuracion,
+        text: "Configuración",
+        path: "/settings"
+      }
+    ]
+  };
+
   const renderMenuItems = () => {
-    switch (auth?.role) {
-      case "empleado":
-        return (
-          <>
-            <div className="menu-item" onClick={() => navigate("/add")}>
-              <div id="imgagregar">
-                <img src={Agregar} alt="Agregar" />
-              </div>
-              <p>Agregar</p>
-            </div>
-          </>
-        );
-
-      case "manager":
-        return (
-          <>
-            <div className="menu-item" onClick={() => navigate("/reports")}>
-              <img src={Informes} alt="Informes" />
-              <p>Informes</p>
-            </div>
-            <div
-              className="menu-item"
-              onClick={() => navigate("/approve-payroll")}
-            >
-              <img src={NominaAprobar} alt="Nómina - Aprobar" />
-              <p>Nómina - Aprobar</p>
-            </div>
-          </>
-        );
-
-      case "superusuario":
-        return (
-          <>
-            <div className="menu-item" onClick={() => navigate("/add")}>
-              <div id="imgagregar">
-                <img src={Agregar} alt="Agregar" />
-              </div>
-              <p>Agregar</p>
-            </div>
-            <div className="menu-item" onClick={() => navigate("/delete")}>
-              <img src={Eliminar} alt="Eliminar" />
-              <p>Actualizar - Eliminar</p>
-            </div>
-            <div className="menu-item" onClick={() => navigate("/reports")}>
-              <img src={Informes} alt="Informes" />
-              <p>Informes</p>
-            </div>
-            <div
-              className="menu-item"
-              onClick={() => navigate("/approve-payroll")}
-            >
-              <img src={NominaAprobar} alt="Nómina - Aprobar" />
-              <p>Nómina - Aprobar</p>
-            </div>
-            <div className="menu-item" onClick={() => navigate("/update")}>
-              <img src={Pagar} alt="Pagar" />
-              <p>Pagar</p>
-            </div>
-            <div className="menu-item" onClick={() => navigate("/settings")}>
-              <img src={Configuracion} alt="Configuración" />
-              <p>Configuración</p>
-            </div>
-          </>
-        );
-      default:
-        return null;
-    }
+    const roleItems = MENU_ITEMS[auth?.role] || [];
+    
+    return roleItems.map((item, index) => (
+      <div 
+        key={index}
+        className="menu-item" 
+        onClick={() => navigate(item.path)}
+      >
+        <div id={item.id}>
+          <img src={item.icon} alt={item.text} />
+        </div>
+        <p>{item.text}</p>
+      </div>
+    ));
   };
 
   return (

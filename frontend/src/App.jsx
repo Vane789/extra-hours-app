@@ -1,81 +1,82 @@
 import "./App.scss";
-
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useContext } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ExtraHoursMenu from "./components/ExtraHoursMenu";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./components/auth/LoginPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ApprovePage from "./pages/ApprovePage";
 import AddExtrahour from "./pages/AddExtrahour";
 import PayExtraHoursPage from "./pages/PayExtraHoursPage";
 import DeleteExtrahour from "./pages/DeleteExtrahour";
-import { AuthProvider } from "./utils/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider, AuthContext } from './components/context/AuthContext';
+
+const ProtectedRoute = ({ children, roles = [] }) => {
+  const { auth, isAuthenticated } = useContext(AuthContext);
+
+  if (!isAuthenticated()) {
+      return <Navigate to="/login" replace />;
+  }
+
+  if (roles.length > 0 && !roles.includes(auth.role)) {
+      return <Navigate to="/menu" replace />;
+  }
+
+  return children;
+};
+
+const ROUTE_ROLES = {
+  '/add': ['USER', 'ADMIN'],
+  '/reports': ['ADMIN'],
+  '/approve-payroll': ['ADMIN'],
+  '/update': ['ADMIN'],
+  '/delete': ['ADMIN'],
+  '/settings': ['ADMIN']
+};
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <BrowserRouter>
+      <AuthProvider>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/menu" element={<ExtraHoursMenu />} />
-          <Route
-            path="/add"
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          <Route 
+            path="/menu" 
             element={
-              <ProtectedRoute
-                allowedRoles={["empleado", "manager", "superusuario"]}
-                element={<AddExtrahour />}
-              />
-            }
+              <ProtectedRoute roles={['USER', 'ADMIN']}>
+                <ExtraHoursMenu />
+              </ProtectedRoute>
+            } 
           />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute
-                allowedRoles={["manager", "superusuario"]}
-                element={<ReportsPage />}
-              />
-            }
-          />
-          <Route
-            path="/approve-payroll"
-            element={
-              <ProtectedRoute
-                allowedRoles={["manager", "superusuario"]}
-                element={<ApprovePage />}
-              />
-            }
-          />
-          <Route
-            path="/update"
-            element={
-              <ProtectedRoute
-                allowedRoles={["superusuario"]}
-                element={<PayExtraHoursPage />}
-              />
-            }
-          />
-          <Route
-            path="/delete"
-            element={
-              <ProtectedRoute
-                allowedRoles={["superusuario"]}
-                element={<DeleteExtrahour />}
-              />
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute
-                allowedRoles={["superusuario"]}
-                element={<SettingsPage />}
-              />
-            }
-          />
+
+          {Object.entries(ROUTE_ROLES).map(([path, roles]) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute roles={roles}>
+                  {(() => {
+                    switch (path) {
+                      case '/add': return <AddExtrahour />;
+                      case '/reports': return <ReportsPage />;
+                      case '/approve-payroll': return <ApprovePage />;
+                      case '/update': return <PayExtraHoursPage />;
+                      case '/delete': return <DeleteExtrahour />;
+                      case '/settings': return <SettingsPage />;
+                      default: return null;
+                    }
+                  })()}
+                </ProtectedRoute>
+              }
+            />
+          ))}
+
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
