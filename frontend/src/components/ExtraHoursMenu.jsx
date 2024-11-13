@@ -8,6 +8,7 @@ import Configuracion from "../assets/images/Configuracion.png";
 import Eliminar from "../assets/images/Eliminar.png";
 import Informes from "../assets/images/Informes.png";
 import NominaAprobar from "../assets/images/NominaAprobar.png";
+import Cerrar from "../assets/images/Cerrar.png";
 
 const ExtraHoursMenu = () => {
   const navigate = useNavigate();
@@ -20,6 +21,12 @@ const ExtraHoursMenu = () => {
         text: "Agregar",
         path: "/add",
         id: "imgagregar"
+      },
+      {
+        icon: Cerrar,
+        text: "Cerrar Sesión",
+        path: "/logout",
+        id: "imgcerrar"
       }
     ],
     ADMIN: [
@@ -53,6 +60,12 @@ const ExtraHoursMenu = () => {
         icon: Configuracion,
         text: "Configuración",
         path: "/settings"
+      },
+      {
+        icon: Cerrar,
+        text: "Cerrar Sesión",
+        path: "/logout",
+        id: "imgcerrar"
       }
     ]
   };
