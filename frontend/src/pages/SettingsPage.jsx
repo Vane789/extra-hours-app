@@ -14,7 +14,8 @@ const Settings = () => {
       </header>
 
       <h2>Configuraciones</h2>
-      <p>
+     <div className="config">
+      <p >
         En Colombia, el pago de las horas extra está regulado por el Código
         Sustantivo del Trabajo, y depende de varios factores como la jornada
         laboral, la hora en que se realicen las horas extra y si estas coinciden
@@ -66,6 +67,7 @@ const Settings = () => {
           </li>
         </ol>
       </p>
+      </div>
     </>
   );
 };
