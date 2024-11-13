@@ -147,7 +147,7 @@ export const ReportInfo = () => {
           />
         </div>
       )}
-      <button onClick={handleExport}>Exportar a Excel</button>
+      <button className="boton" onClick={handleExport}>Exportar a Excel</button>
     </div>
   );
 };

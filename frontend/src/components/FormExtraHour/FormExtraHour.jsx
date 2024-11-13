@@ -130,7 +130,7 @@ export const FormExtraHour = () => {
           <label htmlFor="endTime">
             {" "}
             <br />
-            Hora de fin
+            Hora fin
           </label>
           <input
             type="time"
@@ -184,10 +184,10 @@ export const FormExtraHour = () => {
         />
       </div>
       <div>
-        <label htmlFor="observations">
+        <label className="observations" htmlFor="observations">
           {" "}
           <br />
-          Observaciones
+          <h3 className="observations"> Observacione</h3>
         </label>
         <textarea
           id="observations"

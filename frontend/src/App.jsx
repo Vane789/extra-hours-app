@@ -10,6 +10,7 @@ import AddExtrahour from "./pages/AddExtrahour";
 import PayExtraHoursPage from "./pages/PayExtraHoursPage";
 import DeleteExtrahour from "./pages/DeleteExtrahour";
 import { AuthProvider, AuthContext } from './components/context/AuthContext';
+import Footer from "./components/common/Footer";
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { auth, isAuthenticated } = useContext(AuthContext);
@@ -76,6 +77,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
+      <Footer/>
     </BrowserRouter>
   );
 }

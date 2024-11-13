@@ -75,9 +75,9 @@ const ExtraHoursMenu = () => {
   };
 
   return (
-    <div>
+    <div className="extra-hours-wrapper">
       <div className="menu">
-        <h1>Horas extra Amadeus</h1>
+        <h1>Horas extras Amadeus</h1>
         <div className="grid">{renderMenuItems()}</div>
       </div>
     </div>

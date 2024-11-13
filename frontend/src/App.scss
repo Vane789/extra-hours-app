@@ -1,1 +1,19 @@
-
+html, body {
+    height: 100%;
+    margin: 0;
+    background-image: url("assets/images/background.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+  }
