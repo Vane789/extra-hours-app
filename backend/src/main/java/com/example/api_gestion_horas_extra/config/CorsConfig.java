@@ -1,4 +1,4 @@
-package com.example.api_gestion_horas_extra.Config;
+package com.example.api_gestion_horas_extra.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
