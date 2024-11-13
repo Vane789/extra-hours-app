@@ -74,7 +74,7 @@ const ExtraHoursMenu = () => {
             </div>
             <div className="menu-item" onClick={() => navigate("/settings")}>
               <img src={Configuracion} alt="Configuración" />
-              <p>Configuración</p>
+              <p>Información</p>
             </div>
           </>
         );

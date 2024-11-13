@@ -12,8 +12,8 @@ const AddExtrahour = () => {
           <img className="home" src={home} alt="home" />
           </a>
         </header>
-        <h2>Agregar horas extra</h2>
-        <FormExtraHour />
+        <h2 className="title">Agregar horas extra</h2>
+        <FormExtraHour className="addhour" />
       </div>
     </>
   );

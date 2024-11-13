@@ -10,7 +10,7 @@ const Settings = () => {
           </a>
       </header>
 
-      <h2>Configuraciones</h2>
+      <h2>Información</h2>
      <div className="config">
       <p >
         En Colombia, el pago de las horas extra está regulado por el Código
