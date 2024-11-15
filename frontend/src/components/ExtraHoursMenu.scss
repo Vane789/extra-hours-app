@@ -1,6 +1,14 @@
+@use '@scss/utils/variables' as *;
+@use '@scss/utils/mixins' as *;
+
 .extra-hours-wrapper {
   min-height: 100vh;
+  padding: 0;
+  padding-bottom: 4rem; 
   overflow: hidden;
+  position: relative;
+  overflow-y: auto;
+  background-color: $amadeus-light;
 }
 
 h1 {

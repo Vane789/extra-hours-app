@@ -12,7 +12,23 @@ import Cerrar from "../assets/images/Cerrar.png";
 
 const ExtraHoursMenu = () => {
   const navigate = useNavigate();
-  const { auth, isAdmin, isUser } = useContext(AuthContext);
+  const { auth, logout } = useContext(AuthContext);
+
+  const handleItemClick = (item) => {
+    if (item.onClick) {
+      item.onClick();
+    } else if (item.path) {
+      navigate(item.path);
+    }
+  };
+
+  const logoutAndRedirect = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('email');
+    logout();
+  };
+
 
   const MENU_ITEMS = {
     USER: [
@@ -25,8 +41,9 @@ const ExtraHoursMenu = () => {
       {
         icon: Cerrar,
         text: "Cerrar Sesión",
-        path: "/logout",
-        id: "imgcerrar"
+        path: "#",
+        id: "imgcerrar",
+        onClick: logoutAndRedirect
       }
     ],
     ADMIN: [
@@ -64,8 +81,9 @@ const ExtraHoursMenu = () => {
       {
         icon: Cerrar,
         text: "Cerrar Sesión",
-        path: "/logout",
-        id: "imgcerrar"
+        path: "#",
+        id: "imgcerrar",
+        onClick: logoutAndRedirect
       }
     ]
   };
@@ -77,7 +95,7 @@ const ExtraHoursMenu = () => {
       <div 
         key={index}
         className="menu-item" 
-        onClick={() => navigate(item.path)}
+        onClick={() => handleItemClick(item)}
       >
         <div id={item.id}>
           <img src={item.icon} alt={item.text} />

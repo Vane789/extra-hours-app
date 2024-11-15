@@ -1,0 +1,13 @@
+@mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  @mixin hover-link {
+    transition: all 0.3s ease;
+    &:hover {
+      background: rgba($amadeus-secondary, 0.1);
+      transform: translateX(5px);
+    }
+  }

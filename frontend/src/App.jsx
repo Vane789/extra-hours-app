@@ -11,6 +11,9 @@ import PayExtraHoursPage from "./pages/PayExtraHoursPage";
 import DeleteExtrahour from "./pages/DeleteExtrahour";
 import { AuthProvider, AuthContext } from './components/context/AuthContext';
 import Footer from "./components/common/Footer";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './index.scss';
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const { auth, isAuthenticated } = useContext(AuthContext);
@@ -38,6 +41,7 @@ const ROUTE_ROLES = {
 function App() {
   return (
     <BrowserRouter>
+    <ToastContainer />
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import UserService from '../service/UserService';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,18 @@ export const AuthProvider = ({ children }) => {
         email: localStorage.getItem('email'),
     });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        const email = localStorage.getItem('email');
+        
+        if (token) {
+            setAuth({ token, role, email });
+        } else {
+            setAuth({ token: null, role: null, email: null });
+        }
+    }, []);
 
     const isAuthenticated = () => {
         return !!auth.token;
@@ -57,9 +69,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         console.log("Ejecutando logout");
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('email');
+        localStorage.removeItem("authToken"); 
         
         setAuth({ 
             token: null, 
