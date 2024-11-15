@@ -7,39 +7,18 @@ import { determineExtraHourType } from "@utils/extraHourCalculator";
 
 const options = [
   {
-    value: "zhejiang",
-    label: "Zhejiang",
-    children: [
-      {
-        value: "hangzhou",
-        label: "Hangzhou",
-        children: [
-          {
-            value: "xihu",
-            label: "West Lake",
-          },
-        ],
-      },
-    ],
+    value: "Server Patching Cycle",
+    label: "Server Patching Cycle",
   },
   {
-    value: "jiangsu",
-    label: "Jiangsu",
-    children: [
-      {
-        value: "nanjing",
-        label: "Nanjing",
-        children: [
-          {
-            value: "zhonghuamen",
-            label: "Zhong Hua Men",
-          },
-        ],
-      },
-    ],
+    value: "Zabbix, doker001",
+    label: "Zabbix, doker001",
+  },
+  {
+    value: "NICC-076817",
+    label: "NICC-076817",
   },
 ];
-
 export const FormExtraHour = () => {
   const [extraHours, setExtraHours] = useState({
     registry: "",
@@ -181,26 +160,34 @@ export const FormExtraHour = () => {
         </div>
       </div>
       <div className="form-group-horizontal">
-        <label>Diurna</label>
+        <label>
+          <h3 className="tittle">Diurna</h3>
+        </label>
         <input type="number" name="diurnal" value={extraHours.diurnal} step="0.01" readOnly />
-        <label>Nocturna</label>
+        <label>
+         <h3 className="tittle">Nocturna</h3></label>
         <input type="number" name="nocturnal" value={extraHours.nocturnal} step="0.01" readOnly />
-        <label>Diurna Festiva</label>
+        <label>
+          <h3 className="tittle">Diurna Festiva</h3>
+        </label>
         <input type="number" name="diurnalHoliday" value={extraHours.diurnalHoliday} step="0.01" readOnly />
-        <label>Nocturna Festiva</label>
+        <label>
+          <h3 className="tittle">Nocturna Festiva</h3>
+        </label>
         <input type="number" name="nocturnalHoliday" value={extraHours.nocturnalHoliday} step="0.01" readOnly />
       </div>
-      <div>
-        <label htmlFor="cascader">Ubicación</label>
+      <div className="incidente">
+        <label htmlFor="cascader">
+          <h3 className="tittle">Incidentes</h3></label>
         <Cascader
           options={options}
           onChange={handleCascaderChange}
-          placeholder="Seleccione una ubicación"
+          placeholder="Seleccione un incidente"
         />
       </div>
-      <div>
-        <label className="observations" htmlFor="observations">
-          <h3 className="observations">Observaciones</h3>
+      <div className="observations">
+        <label  htmlFor="observations">
+          <h3 className="tittle">Observaciones</h3>
         </label>
         <textarea
           id="observations"
