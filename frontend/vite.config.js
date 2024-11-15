@@ -15,5 +15,12 @@ export default defineConfig({
       "@services": path.resolve("./src/services"),
       "@utils": path.resolve("./src/utils"),
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "@scss/utils/variables" as *;`,
+        },
+      },
+    },
   },
 });
