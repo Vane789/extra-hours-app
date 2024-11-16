@@ -1,6 +1,5 @@
 import "./App.scss";
 import { useContext } from "react";
-import { useLocation } from "react-router-dom";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ExtraHoursMenu from "./components/ExtraHoursMenu";
 import LoginPage from "./components/auth/LoginPage";
@@ -40,9 +39,6 @@ const ROUTE_ROLES = {
 };
 
 function App() {
-  const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
-  console.log(isLoginPage); 
   return (
     <>
       <ToastContainer />
@@ -94,7 +90,7 @@ function App() {
           </Routes>
         </div>
       </AuthProvider>
-      <Footer className={isLoginPage ? "footer footer-fixed" : "footer"} />
+      <Footer/>
     </>
   );
 }
