@@ -1,6 +1,6 @@
 package com.example.api_gestion_horas_extra.entity;
 
-import com.example.api_gestion_horas_extra.dto.EmployeeDetailsDTO;
+//import com.example.api_gestion_horas_extra.dto.EmployeeDetailsDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
