@@ -34,6 +34,11 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         final String jwtToken;
         final String userEmail;
 
+        if (request.getRequestURI().startsWith("/api/v1/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (authHeader == null || authHeader.isBlank()) {
             filterChain.doFilter(request, response);
             return;
