@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class OurUsers implements UserDetails {
     private String password;
     private String position;
     private String city;
+    private BigDecimal salary;
 
     @Enumerated(EnumType.STRING)
     private Role role;
