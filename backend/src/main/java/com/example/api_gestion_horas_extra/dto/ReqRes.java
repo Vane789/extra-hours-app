@@ -23,6 +23,7 @@ public class ReqRes {
     private String city;
     private String role;
     private String position;
+    private Double salary;
     private String email;
     private String password;
     private OurUsers ourUsers;
