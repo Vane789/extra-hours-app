@@ -18,9 +18,6 @@ public class ExtraHours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "hourprice")
-    private BigDecimal hourprice;
-
     @Column(name = "startdatetime")
     private LocalDateTime startdatetime;
 

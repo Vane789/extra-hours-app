@@ -21,7 +21,6 @@ public class OurUsers implements UserDetails {
 
     @Column(unique = true, nullable = false)
     private String identification;
-
     private String email;
     private String name;
     private String password;

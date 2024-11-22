@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class ExtraHoursDTO {
-    private Double hourprice;
     private LocalDateTime startdatetime;
     private LocalDateTime enddatetime;
     private Double amountextrahours;

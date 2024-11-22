@@ -49,7 +49,6 @@ public class ExtraHoursService {
         Optional<ExtraHours> existingExtraHour = extraHoursRepo.findById(id);
         if (existingExtraHour.isPresent()) {
             ExtraHours extraHour = existingExtraHour.get();
-            extraHour.setHourprice(updatedExtraHour.getHourprice());
             extraHour.setStartdatetime(updatedExtraHour.getStartdatetime());
             extraHour.setEnddatetime(updatedExtraHour.getEnddatetime());
             extraHour.setAmountextrahours(updatedExtraHour.getAmountextrahours());
