@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Cascader } from "antd"; // Importar correctamente el Cascader de antd
+import { Cascader } from "antd"; 
 import { addExtraHour } from "@services/addExtraHour";
 import { EmployeeInfo } from "../EmployeeInfo/EmployeeInfo";
 import "./FormExtraHour.scss";
 import { determineExtraHourType } from "@utils/extraHourCalculator";
+import { toast } from 'react-toastify';
 
 const options = [
   {
@@ -19,6 +20,14 @@ const options = [
     label: "NICC-076817",
   },
 ];
+
+const extraHourTypes = [
+  { value: "diurnal", label: "Diurna (50%)" },
+  { value: "nocturnal", label: "Nocturna (75%)" },
+  { value: "diurnalHoliday", label: "Diurna Festiva (100%)" },
+  { value: "nocturnalHoliday", label: "Nocturna Festiva (150%)" },
+];
+
 export const FormExtraHour = () => {
   const [extraHours, setExtraHours] = useState({
     registry: "",
@@ -32,9 +41,10 @@ export const FormExtraHour = () => {
     nocturnalHoliday: 0,
     extrasHours: 0,
     observations: "",
-    location: "", // Agregar un campo para almacenar la selección del cascader
+    location: "", 
   });
 
+  const [totalPayment, setTotalPayment] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resetEmployeeInfo, setResetEmployeeInfo] = useState(false);
@@ -62,6 +72,28 @@ export const FormExtraHour = () => {
     }));
   };
 
+  const handleExtraHourTypeChange = (value) => {
+    const percentage = {
+      diurnal: 0.5,
+      nocturnal: 0.75,
+      diurnalHoliday: 1.0,
+      nocturnalHoliday: 1.5,
+    }[value[0]];
+
+    setExtraHours((prevData) => ({
+      ...prevData,
+      extraHourType: value[0],
+      extrasHours: calculateExtraHours(extraHours.startTime, extraHours.endTime) * percentage,
+    }));
+  };
+
+  const calculateExtraHours = (startTime, endTime) => {
+    const start = new Date(`1970-01-01T${startTime}:00`);
+    const end = new Date(`1970-01-01T${endTime}:00`);
+    const diff = (end - start) / (1000 * 60 * 60);
+    return diff > 0 ? diff : 0;
+  };
+
   // useEffect para calcular horas extra automáticamente cuando se cambian los tiempos
   useEffect(() => {
     if (extraHours.date && extraHours.startTime && extraHours.endTime) {
@@ -74,6 +106,13 @@ export const FormExtraHour = () => {
       );
     }
   }, [extraHours.date, extraHours.startTime, extraHours.endTime]);
+
+  useEffect(() => {
+    if (extraHours.extrasHours) {
+      const rate = 10; // Example rate per hour
+      setTotalPayment(extraHours.extrasHours * rate);
+    }
+  }, [extraHours.extrasHours]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -159,22 +198,41 @@ export const FormExtraHour = () => {
           />
         </div>
       </div>
-      <div className="form-group-horizontal">
-        <label>
-          <h3 className="tittle">Diurna</h3>
-        </label>
-        <input type="number" name="diurnal" value={extraHours.diurnal} step="0.01" readOnly />
-        <label>
-         <h3 className="tittle">Nocturna</h3></label>
-        <input type="number" name="nocturnal" value={extraHours.nocturnal} step="0.01" readOnly />
-        <label>
-          <h3 className="tittle">Diurna Festiva</h3>
-        </label>
-        <input type="number" name="diurnalHoliday" value={extraHours.diurnalHoliday} step="0.01" readOnly />
-        <label>
-          <h3 className="tittle">Nocturna Festiva</h3>
-        </label>
-        <input type="number" name="nocturnalHoliday" value={extraHours.nocturnalHoliday} step="0.01" readOnly />
+      <div className="extra-hour-group">
+        <div className="extra-hour-type">
+          <label htmlFor="extraHourType">
+            <h3 className="tittle">Tipo de Hora Extra</h3>
+          </label>
+          <Cascader
+            options={extraHourTypes}
+            onChange={handleExtraHourTypeChange}
+            placeholder="Seleccione el tipo de hora extra"
+          />
+        </div>
+        <div className="form-group-horizontal">
+          <label htmlFor="extrasHours">
+            <h3 className="tittle">Horas Extras</h3>
+          </label>
+          <input
+            type="number"
+            id="extrasHours"
+            name="extrasHours"
+            value={extraHours.extrasHours}
+            readOnly
+          />
+        </div>
+        <div className="total-payment">
+          <label htmlFor="totalPayment">
+            <h3 className="tittle">Total a Pagar</h3>
+          </label>
+          <input
+            type="number"
+            id="totalPayment"
+            name="totalPayment"
+            value={totalPayment}
+            readOnly
+          />
+        </div>
       </div>
       <div className="incidente">
         <label htmlFor="cascader">

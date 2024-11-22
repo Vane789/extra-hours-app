@@ -1,5 +1,5 @@
 import "./App.scss";
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ExtraHoursMenu from "./components/ExtraHoursMenu";
 import LoginPage from "./components/auth/LoginPage";
@@ -38,6 +38,15 @@ const ROUTE_ROLES = {
   "/settings": ["ADMIN"],
 };
 
+const routeComponents = {
+  "/add": AddExtrahour,
+  "/reports": ReportsPage,
+  "/approve-payroll": ApprovePage,
+  "/update": PayExtraHoursPage,
+  "/delete": DeleteExtrahour,
+  "/settings": SettingsPage,
+};
+
 function App() {
   return (
     <>
@@ -47,7 +56,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
-
+            
             <Route
               path="/menu"
               element={
@@ -56,31 +65,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             {Object.entries(ROUTE_ROLES).map(([path, roles]) => (
               <Route
                 key={path}
                 path={path}
                 element={
                   <ProtectedRoute roles={roles}>
-                    {(() => {
-                      switch (path) {
-                        case "/add":
-                          return <AddExtrahour />;
-                        case "/reports":
-                          return <ReportsPage />;
-                        case "/approve-payroll":
-                          return <ApprovePage />;
-                        case "/update":
-                          return <PayExtraHoursPage />;
-                        case "/delete":
-                          return <DeleteExtrahour />;
-                        case "/settings":
-                          return <SettingsPage />;
-                        default:
-                          return null;
-                      }
-                    })()}
+                    {React.createElement(routeComponents[path])}
                   </ProtectedRoute>
                 }
               />
@@ -90,9 +82,10 @@ function App() {
           </Routes>
         </div>
       </AuthProvider>
-      <Footer/>
+      <Footer />
     </>
   );
 }
 
 export default App;
+
