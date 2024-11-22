@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Cascader } from "antd"; 
-import { addExtraHour } from "@services/addExtraHour";
+import { addExtraHour } from "@service/addExtraHour";
 import { EmployeeInfo } from "../EmployeeInfo/EmployeeInfo";
 import "./FormExtraHour.scss";
 import { determineExtraHourType } from "@utils/extraHourCalculator";
@@ -134,7 +134,7 @@ export const FormExtraHour = () => {
 
     try {
       await addExtraHour(body);
-      alert("Horas extras agregadas exitosamente");
+      toast.success("Horas extras agregadas exitosamente");
 
       setExtraHours({
         registry: "",
@@ -154,6 +154,7 @@ export const FormExtraHour = () => {
       setResetEmployeeInfo(true);
     } catch (error) {
       setError(error.message);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -257,7 +258,6 @@ export const FormExtraHour = () => {
       <button type="submit" disabled={loading}>
         {loading ? "Enviando..." : "Agregar"}
       </button>
-      {error && <p>Error: {error}</p>}
     </form>
   );
 };

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Input, Table, DatePicker } from "antd";
-import { findEmployee } from "@services/findEmployee";
-import { findExtraHour } from "@services/findExtraHour";
-import { findExtraHourByDateRange } from "@services/findExtraHourByDateRange";
+import { findEmployee } from "@service/findEmployee";
+import { findExtraHour } from "@service/findExtraHour";
+import { findExtraHourByDateRange } from "@service/findExtraHourByDateRange";
 import ExcelJS from "exceljs";
 import { columns } from "@utils/tableColumns";
 import "./ReportInfo.scss";

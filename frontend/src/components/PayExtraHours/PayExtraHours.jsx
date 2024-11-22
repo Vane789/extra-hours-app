@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input, Table, Button, message } from "antd";
-import { findEmployeeWithExtraHours } from "@services/findEmployeeWithExtraHours";
+import { findEmployeeWithExtraHours } from "@service/findEmployeeWithExtraHours";
 import { columns as staticColumns } from "@utils/tableColumns";
 
 import "./PayExtraHours.scss";
