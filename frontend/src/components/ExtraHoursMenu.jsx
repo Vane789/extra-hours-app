@@ -96,6 +96,7 @@ const ExtraHoursMenu = () => {
       </Menu.Item>
     </Menu>
   );
+  console.log("Estado auth:", auth);
 
   return (
     <Layout className="extra-hours-layout">
@@ -108,7 +109,7 @@ const ExtraHoursMenu = () => {
           <div className="extra-hours-header-user">
             <Space>
               <Avatar icon={<UserOutlined />} />
-              <Text>{auth?.email}</Text>
+              <Text>{auth?.name}</Text>
             </Space>
           </div>
         </Dropdown>

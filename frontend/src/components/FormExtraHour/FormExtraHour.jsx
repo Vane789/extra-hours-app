@@ -30,21 +30,17 @@ const extraHourTypes = [
 
 export const FormExtraHour = () => {
   const [extraHours, setExtraHours] = useState({
-    registry: "",
-    id: "",
+    id: "id-usuario",
     date: "",
-    startTime: "",
-    endTime: "",
-    diurnal: 0,
-    nocturnal: 0,
-    diurnalHoliday: 0,
-    nocturnalHoliday: 0,
-    extrasHours: 0,
-    observations: "",
-    location: "", 
+    startime: "",
+    endtime: "",
+    extrahourtype: "",
+    totalextrahour: 0,
+    comments: "",
+    incident: "",
+    totalpayment: 0
   });
 
-  const [totalPayment, setTotalPayment] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resetEmployeeInfo, setResetEmployeeInfo] = useState(false);
@@ -58,6 +54,9 @@ export const FormExtraHour = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("extrahours handleChange " , extraHours)
+    console.log("handleChange name -< " , name)
+    console.log("handleChange value -< " , value)
     setExtraHours((prevData) => ({
       ...prevData,
       [name]: value,
@@ -68,90 +67,113 @@ export const FormExtraHour = () => {
   const handleCascaderChange = (value) => {
     setExtraHours((prevData) => ({
       ...prevData,
-      location: value.join(" > "), // Une los valores seleccionados
+      incident: value.join(" > "), // Une los valores seleccionados
     }));
   };
 
-  const handleExtraHourTypeChange = (value) => {
-    const percentage = {
-      diurnal: 0.5,
-      nocturnal: 0.75,
-      diurnalHoliday: 1.0,
-      nocturnalHoliday: 1.5,
+  const getOptionsTypeHours = (value) => { 
+    return {
+      diurnal: {
+        name: "diurnal",
+        porcentage: 0.5
+      },
+      nocturnal: {
+        name: "nocturnal",
+        porcentage: 0.75
+      },
+      diurnalHoliday: {
+        name: "diurnalHoliday",
+        porcentage: 1.0
+      },
+      nocturnalHoliday: {
+        name: "nocturnalHoliday",
+        porcentage: 1.5
+      },
     }[value[0]];
+  }
 
-    setExtraHours((prevData) => ({
-      ...prevData,
-      extraHourType: value[0],
-      extrasHours: calculateExtraHours(extraHours.startTime, extraHours.endTime) * percentage,
-    }));
+  const handleExtraHourTypeChange = (value) => {
+    setExtraHours((prevData) => {
+      return {
+        ...prevData,
+        extrahourtype: getOptionsTypeHours(value).name,
+        totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
+        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours(value).porcentage * 20000
+      }
+    });
   };
 
   const calculateExtraHours = (startTime, endTime) => {
-    const start = new Date(`1970-01-01T${startTime}:00`);
-    const end = new Date(`1970-01-01T${endTime}:00`);
-    const diff = (end - start) / (1000 * 60 * 60);
-    return diff > 0 ? diff : 0;
+    const [startHours, startMinutes] = startTime.split(":").map(Number);
+    const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+
+    const diffMinutes = endTotalMinutes - startTotalMinutes;
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = diffMinutes % 60;
+
+    const roundedHours = minutes > 30 ? hours + 1 : hours;
+    console.log("roundedHours " , roundedHours)
+    return roundedHours
   };
 
   // useEffect para calcular horas extra automáticamente cuando se cambian los tiempos
   useEffect(() => {
-    if (extraHours.date && extraHours.startTime && extraHours.endTime) {
-      determineExtraHourType(
-        extraHours.date,
-        extraHours.startTime,
-        extraHours.endTime,
-        setError,
-        setExtraHours
-      );
-    }
-  }, [extraHours.date, extraHours.startTime, extraHours.endTime]);
+    if ( extraHours.startime && extraHours.endtime &&  extraHours.extrahourtype) {
+      setExtraHours((prevData) => ({
+        ...prevData,
+        totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
+        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours([extraHours.extrahourtype]).porcentage * 20000
 
-  useEffect(() => {
-    if (extraHours.extrasHours) {
-      const rate = 10; // Example rate per hour
-      setTotalPayment(extraHours.extrasHours * rate);
+      }));
     }
-  }, [extraHours.extrasHours]);
+  }, [extraHours.startime, extraHours.endtime]);
+
+  // useEffect(() => {
+  //   if (extraHours.totalextrahour) {
+  //     const rate = 10; // Example rate per hour
+  //     setTotalPayment(extraHours.totalextrahour * rate);
+  //   }
+  // }, [extraHours.totalextrahour]);
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    console.log("informacion de todo el formulario --> "  , extraHours)
     // Asegurar el cálculo antes de enviar
-    determineExtraHourType(
-      extraHours.date,
-      extraHours.startTime,
-      extraHours.endTime,
-      setError,
-      setExtraHours
-    );
+    // determineExtraHourType(
+    //   extraHours.date,
+    //   extraHours.startTime,
+    //   extraHours.endTime,
+    //   setError,
+    //   setExtraHours
+    // );
 
-    const body = {
-      ...extraHours,
-    };
-
+    // const body = {
+    //   ...totalextrahour,
+    // };
     try {
-      await addExtraHour(body);
+      //await addExtraHour(body);
       toast.success("Horas extras agregadas exitosamente");
 
-      setExtraHours({
-        registry: "",
-        id: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        diurnal: 0,
-        nocturnal: 0,
-        diurnalHoliday: 0,
-        nocturnalHoliday: 0,
-        extrasHours: 0,
-        observations: "",
-        location: "",
-      });
+      // setExtraHours({
+      //   date: "",
+      //   startTime: "",
+      //   endTime: "",
+      //   hourTypes: "",
+      //   extrasHours: 0,
+      //   observations: "",
+      //   incident: "",
+      // });
+  
 
-      setResetEmployeeInfo(true);
+      //setResetEmployeeInfo(true);
     } catch (error) {
       setError(error.message);
       toast.error(`Error: ${error.message}`);
@@ -183,7 +205,7 @@ export const FormExtraHour = () => {
           <input
             type="time"
             id="startTime"
-            name="startTime"
+            name="startime"
             value={extraHours.startTime}
             onChange={handleChange}
           />
@@ -193,7 +215,7 @@ export const FormExtraHour = () => {
           <input
             type="time"
             id="endTime"
-            name="endTime"
+            name="endtime"
             value={extraHours.endTime}
             onChange={handleChange}
           />
@@ -217,8 +239,8 @@ export const FormExtraHour = () => {
           <input
             type="number"
             id="extrasHours"
-            name="extrasHours"
-            value={extraHours.extrasHours}
+            name="totalextrahour"
+            value={extraHours.totalextrahour}
             readOnly
           />
         </div>
@@ -229,8 +251,8 @@ export const FormExtraHour = () => {
           <input
             type="number"
             id="totalPayment"
-            name="totalPayment"
-            value={totalPayment}
+            name="totalpayment"
+            value={extraHours.totalpayment}
             readOnly
           />
         </div>
@@ -250,8 +272,8 @@ export const FormExtraHour = () => {
         </label>
         <textarea
           id="observations"
-          name="observations"
-          value={extraHours.observations}
+          name="comments"
+          value={extraHours.comments}
           onChange={handleChange}
         />
       </div>

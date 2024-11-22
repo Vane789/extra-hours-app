@@ -16,11 +16,12 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
         const email = localStorage.getItem('email');
+        const name = localStorage.getItem('name');
         
         if (token) {
-            setAuth({ token, role, email });
+            setAuth({ token, role, email, name });
         } else {
-            setAuth({ token: null, role: null, email: null });
+            setAuth({ token: null, role: null, email: null, name: null });
         }
     }, []);
 
@@ -39,10 +40,14 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('role', userData.role);
                 localStorage.setItem('email', email);
 
+                const profile = await UserService.getYourProfile(userData.token);
+                localStorage.setItem('name', profile.name);
+
                 setAuth({ 
                     token: userData.token, 
                     role: userData.role, 
-                    email: email 
+                    email: email,
+                    name: profile.name,
                 });
 
                 console.log("Login exitoso, rol:", userData.role);

@@ -41,49 +41,49 @@ export const determineExtraHourType = (
     }
   };
 
-  while (current < endDateTime) {
-    const isHoliday = hd.isHoliday(current) || current.getDay() === 0; // Verificar si la hora actual es festiva
-    const hour = current.getHours();
-    const minutes = current.getMinutes();
-    const nextHour = new Date(current);
-    nextHour.setHours(current.getHours() + 1);
-    const actualEnd = nextHour > endDateTime ? endDateTime : nextHour;
+  // while (current < endDateTime) {
+  //   // const isHoliday = hd.isHoliday(current) || current.getDay() === 0; // Verificar si la hora actual es festiva
+  //   const hour = current.getHours();
+  //   const minutes = current.getMinutes();
+  //   const nextHour = new Date(current);
+  //   nextHour.setHours(current.getHours() + 1);
+  //   const actualEnd = nextHour > endDateTime ? endDateTime : nextHour;
 
-    // Calcular la diferencia directamente en horas
-    const hoursDiff = (actualEnd - current) / 1000 / 60 / 60;
+  //   // Calcular la diferencia directamente en horas
+  //   const hoursDiff = (actualEnd - current) / 1000 / 60 / 60;
 
-    // Calcular horas diurnas (de 6:00 AM a 9:00 PM)
-    if (hour >= 6 && hour < 21) {
-      if (hour === 20) {
-        // Si estamos entre las 8:00 PM y las 9:00 PM
-        const remainingMinutes = 21 * 60 - (hour * 60 + minutes); // Minutos restantes hasta las 9:00 PM
-        const remainingHours = remainingMinutes / 60; // Convertir minutos restantes a horas
+  //   // Calcular horas diurnas (de 6:00 AM a 9:00 PM)
+  //   if (hour >= 6 && hour < 21) {
+  //     if (hour === 20) {
+  //       // Si estamos entre las 8:00 PM y las 9:00 PM
+  //       const remainingMinutes = 21 * 60 - (hour * 60 + minutes); // Minutos restantes hasta las 9:00 PM
+  //       const remainingHours = remainingMinutes / 60; // Convertir minutos restantes a horas
 
-        handleExtraHours(isHoliday, remainingHours, false); // Sumar a diurna o festiva diurna
-        const nocturnalHours = hoursDiff - remainingHours;
-        if (nocturnalHours > 0) {
-          handleExtraHours(isHoliday, nocturnalHours, true); // Sumar a nocturna o festiva nocturna
-        }
-      } else {
-        handleExtraHours(isHoliday, hoursDiff, false); // Sumar horas diurnas
-      }
-    } else if (hour >= 21 || hour < 6) {
-      if (hour < 6 && hour === 5) {
-        const remainingMinutes = 6 * 60 - (hour * 60 + minutes);
-        const remainingHours = remainingMinutes / 60;
+  //       // handleExtraHours(isHoliday, remainingHours, false); // Sumar a diurna o festiva diurna
+  //       const nocturnalHours = hoursDiff - remainingHours;
+  //       if (nocturnalHours > 0) {
+  //         handleExtraHours(isHoliday, nocturnalHours, true); // Sumar a nocturna o festiva nocturna
+  //       }
+  //     } else {
+  //       handleExtraHours(isHoliday, hoursDiff, false); // Sumar horas diurnas
+  //     }
+  //   } else if (hour >= 21 || hour < 6) {
+  //     if (hour < 6 && hour === 5) {
+  //       const remainingMinutes = 6 * 60 - (hour * 60 + minutes);
+  //       const remainingHours = remainingMinutes / 60;
 
-        handleExtraHours(isHoliday, remainingHours, true); // Sumar a nocturna o festiva nocturna
-        const diurnalHours = hoursDiff - remainingHours;
-        if (diurnalHours > 0) {
-          handleExtraHours(isHoliday, diurnalHours, false); // Sumar a diurna o festiva diurna
-        }
-      } else {
-        handleExtraHours(isHoliday, hoursDiff, true); // Sumar horas nocturnas
-      }
-    }
+  //       handleExtraHours(isHoliday, remainingHours, true); // Sumar a nocturna o festiva nocturna
+  //       const diurnalHours = hoursDiff - remainingHours;
+  //       if (diurnalHours > 0) {
+  //         handleExtraHours(isHoliday, diurnalHours, false); // Sumar a diurna o festiva diurna
+  //       }
+  //     } else {
+  //       handleExtraHours(isHoliday, hoursDiff, true); // Sumar horas nocturnas
+  //     }
+  //   }
 
-    current = nextHour; // Avanzar a la siguiente hora
-  }
+  //   current = nextHour; // Avanzar a la siguiente hora
+  // }
 
   const extrasHours = diurnal + nocturnal + diurnalHoliday + nocturnalHoliday;
 
