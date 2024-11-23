@@ -1,7 +1,11 @@
 import "./SettingsPage.scss";
 import home from "../assets/images/home.png";
+import { Typography } from "antd"; 
+
+const { Title } = Typography; 
 
 const Settings = () => {
+  const pageTitle = "Información";
   return (
     <>
       <header className="page__header">
@@ -9,8 +13,7 @@ const Settings = () => {
           <img className="home" src={home} alt="home" />
           </a>
       </header>
-
-      <h2>Información</h2>
+      <Title level={2} className="title">{pageTitle}</Title>
      <div className="config">
       <p >
         En Colombia, el pago de las horas extra está regulado por el Código

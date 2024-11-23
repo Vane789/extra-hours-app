@@ -1,8 +1,12 @@
 import "./PayExtraHoursPage.scss";
 import { PayExtraHours } from "../components/PayExtraHours/PayExtraHours";
 import home from "../assets/images/home.png";
+import { Typography } from "antd"; 
+
+const { Title } = Typography; 
 
 const PayExtraHoursPage = () => {
+  const pageTitle = "Pagar horas extras";
   return (
     <>
       <header className="page__header">
@@ -10,8 +14,7 @@ const PayExtraHoursPage = () => {
           <img className="home" src={home} alt="home" />
           </a>
       </header>
-
-      <h2>Pagar horas extra</h2>
+      <Title level={2} className="title">{pageTitle}</Title>
       <PayExtraHours />
     </>
   );

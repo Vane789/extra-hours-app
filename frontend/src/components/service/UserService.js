@@ -3,57 +3,106 @@ import axios from "axios";
 class UserService {
     static BASE_URL = "http://localhost:8080/api/v1";
 
+    static api = axios.create({
+        baseURL: this.BASE_URL,
+    });
+
     static getAuthHeaders(token) {
         return { Authorization: `Bearer ${token}` };
     }
 
     // Métodos de autenticación
     static async login(email, password) {
-        return axios.post(`${this.BASE_URL}/auth/login`, { email, password })
-            .then(response => response.data);
+        try {
+            const response = await this.api.post("/auth/login", { email, password });
+            return response.data;
+        } catch (error) {
+            console.error("Error en login:", error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
     static async register(userData, token) {
-        return axios.post(`${this.BASE_URL}/auth/register`, userData, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+        try {
+            const response = await this.api.post("/auth/register", userData, {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Error al registrar usuario:", error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
     // Métodos de usuario
     static async getAllUsers(token) {
-        return axios.get(`${this.BASE_URL}/admin/get-all-users`, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+        try {
+            const response = await this.api.get("/admin/get-all-users", {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Error al obtener todos los usuarios:", error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
     static async getYourProfile(token) {
-        return axios.get(`${this.BASE_URL}/adminuser/profile`, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data.ourUsers); 
+        try {
+            const response = await this.api.get("/adminuser/profile", {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data?.ourUsers || null; // Devuelve `null` si no hay datos
+        } catch (error) {
+            console.error("Error al obtener el perfil del usuario:", error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
-    static async getUserById(userId, token) {
-        return axios.get(`${this.BASE_URL}/admin/get-user/${userId}`, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+    static async getUserById(identification, token) {
+        try {
+            const response = await this.api.get(`/admin/get-user/${identification}`, {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`Error al obtener usuario con identificación ${identification}:`, error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
-    static async deleteUser(userId, token) {
-        return axios.delete(`${this.BASE_URL}/admin/delete-user/${userId}`, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+    static async deleteUser(identification, token) {
+        try {
+            const response = await this.api.delete(`/admin/delete-user/${identification}`, {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`Error al eliminar usuario con identificación ${identification}:`, error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
-    static async updateUser(userId, userData, token) {
-        return axios.put(`${this.BASE_URL}/admin/update-user/${userId}`, userData, {
-            headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+    static async updatePassword(identification, passwordData, token) {
+        try {
+            const response = await this.api.put(`/users/password/${identification}`, passwordData, {
+                headers: this.getAuthHeaders(token),
+            });
+            return response.data;
+        } catch (error) {
+            console.error(`Error al actualizar la contraseña del usuario ${identification}:`, error.response?.data || error.message);
+            throw error.response?.data || error.message;
+        }
     }
 
     // Métodos de control de autenticación
     static logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('role');
+        localStorage.removeItem('email');
+        localStorage.removeItem('name');
+        localStorage.removeItem('identification');
+        localStorage.removeItem('salary');
     }
 
     static isAuthenticated() {
@@ -66,10 +115,6 @@ class UserService {
 
     static isUser() {
         return localStorage.getItem('role') === 'USER';
-    }
-
-    static adminOnly() {
-        return this.isAuthenticated() && this.isAdmin();
     }
 }
 

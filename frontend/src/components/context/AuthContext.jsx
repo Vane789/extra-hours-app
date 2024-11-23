@@ -9,6 +9,8 @@ export const AuthProvider = ({ children }) => {
         token: localStorage.getItem('token'),
         role: localStorage.getItem('role'),
         email: localStorage.getItem('email'),
+        identification: localStorage.getItem('identification'),
+        salary: localStorage.getItem('salary'),
     });
     const navigate = useNavigate();
 
@@ -17,13 +19,17 @@ export const AuthProvider = ({ children }) => {
         const role = localStorage.getItem('role');
         const email = localStorage.getItem('email');
         const name = localStorage.getItem('name');
+        const identification = localStorage.getItem('identification');
+        const salary = localStorage.getItem('salary');
         
         if (token) {
-            setAuth({ token, role, email, name });
+            setAuth({ token, role, email, name, identification, salary });
         } else {
-            setAuth({ token: null, role: null, email: null, name: null });
+            setAuth({ token: null, role: null, email: null, name: null, identification: null, salary: null });
         }
     }, []);
+
+    console.log(auth,"auth");
 
     const isAuthenticated = () => {
         return !!auth.token;
@@ -42,12 +48,16 @@ export const AuthProvider = ({ children }) => {
 
                 const profile = await UserService.getYourProfile(userData.token);
                 localStorage.setItem('name', profile.name);
+                localStorage.setItem('identification', profile.identification);
+                localStorage.setItem('salary', profile.salary);
 
                 setAuth({ 
                     token: userData.token, 
                     role: userData.role, 
                     email: email,
                     name: profile.name,
+                    identification: profile.identification,
+                    salary: profile.salary,
                 });
 
                 console.log("Login exitoso, rol:", userData.role);
@@ -74,12 +84,13 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         console.log("Ejecutando logout");
-        localStorage.removeItem("authToken"); 
+        localStorage.removeItem("token"); 
         
         setAuth({ 
             token: null, 
             role: null, 
-            email: null 
+            email: null,
+            name: null 
         });
         
         UserService.logout();

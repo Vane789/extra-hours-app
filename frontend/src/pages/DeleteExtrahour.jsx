@@ -1,8 +1,12 @@
 import { UpdateAndDelete } from "../components/UpdateAndDelete/UpdateAndDelete";
 import "./DeleteExtrahour.scss";
 import home from "../assets/images/home.png";
+import { Typography } from "antd"; 
+
+const { Title } = Typography; 
 
 const DeleteExtrahour = () => {
+  const pageTitle = "Actualizar - Eliminar horas extra";
   return (
     <>
       <div>
@@ -11,7 +15,7 @@ const DeleteExtrahour = () => {
           <img className="home" src={home} alt="home" />
           </a>
         </header>
-        <h2>Actualizar - Eliminar horas extra</h2>
+        <Title level={2} className="title">{pageTitle}</Title>
         <UpdateAndDelete />
       </div>
     </>
