@@ -174,14 +174,7 @@ export const FormExtraHour = () => {
           step="0.01"
           readOnly
         />
-        <label>Total horas extra</label>
-        <input
-          type="number"
-          name="extrasHours"
-          value={extraHours.extrasHours}
-          step="0.01"
-          readOnly
-        />
+       
       </div>
       <div>
         <label className="observations" htmlFor="observations">

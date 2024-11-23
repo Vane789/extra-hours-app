@@ -38,15 +38,7 @@ export const EmployeeInfo = ({ onIdChange, reset, setReset }) => {
 
   return (
     <div className="Info">
-      <div className="search-container">
-        <Search placeholder="Cédula" onSearch={onSearch} />
-        {notFound && (
-          <span id="textoerror">
-            Empleado no encontrado, intente con otra cédula
-          </span>
-        )}
-      </div>
-
+    
       {!!Object.keys(employee).length && (
         <div className="detailsInfo">
           <div className="description-item">
