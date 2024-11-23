@@ -15,10 +15,11 @@ import java.util.List;
 public class ExtraHoursController {
     @Autowired
     private ExtraHoursService extraHoursService;
-
     @PostMapping
-    public ResponseEntity<ExtraHours> addExtraHour(@RequestBody ExtraHours extraHour) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(extraHoursService.addExtraHour(extraHour));
+    public ResponseEntity<ExtraHours> addExtraHour(@RequestBody ExtraHoursDTO extraHourDTO) {
+        System.out.println("extraHour JSON" + extraHourDTO.toString());
+        System.out.println("consumiendooooo");
+        return ResponseEntity.status(HttpStatus.CREATED).body(extraHoursService.addExtraHour(extraHourDTO));
     }
 
     @GetMapping

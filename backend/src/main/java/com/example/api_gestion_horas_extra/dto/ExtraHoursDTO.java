@@ -2,16 +2,19 @@ package com.example.api_gestion_horas_extra.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class ExtraHoursDTO {
-    private LocalDateTime startdatetime;
-    private LocalDateTime enddatetime;
-    private Double amountextrahours;
+    private String date;
+    private String startime;
+    private String endtime;
     private String comments;
-    private Double totalpayment;
-    private String userIdentification;
-    private String extraHourTypeDescription;
-    private String incidentDescription;
+    private BigDecimal totalextrahour;
+    private BigDecimal totalpayment;
+    private String identification;
+    private Integer incidentId  ;
+    private Integer extrahourtype;
 }
