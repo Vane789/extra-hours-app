@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +36,18 @@ public class UsersManagementService {
                 resp.setMessage("A user with this identification already exists");
                 return resp;
             }
+            if (usersRepo.findByEmail(registrationRequest.getEmail()).isPresent()) {
+                resp.setStatusCode(400);
+                resp.setMessage("A user with this email already exists");
+                return resp;
+            }
 
             OurUsers ourUser = new OurUsers();
             ourUser.setIdentification(registrationRequest.getIdentification());
             ourUser.setEmail(registrationRequest.getEmail());
             ourUser.setCity(registrationRequest.getCity());
             ourUser.setRole(Role.valueOf(registrationRequest.getRole()));
+            ourUser.setSalary(BigDecimal.valueOf(registrationRequest.getSalary()));
             ourUser.setPosition(registrationRequest.getPosition());
             ourUser.setName(registrationRequest.getName());
             ourUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
@@ -159,42 +166,24 @@ public class UsersManagementService {
         return reqRes;
     }
 
-    public ReqRes updateUserByIdentification(String identification, OurUsers updatedUser) {
+    public ReqRes updatePasswordByIdentification(String identification, String newPassword) {
         ReqRes reqRes = new ReqRes();
         try {
             Optional<OurUsers> userOptional = usersRepo.findByIdentification(identification);
             if (userOptional.isPresent()) {
                 OurUsers existingUser = userOptional.get();
+                existingUser.setPassword(passwordEncoder.encode(newPassword));
 
-                if (!identification.equals(updatedUser.getIdentification()) &&
-                        usersRepo.findByIdentification(updatedUser.getIdentification()).isPresent()) {
-                    reqRes.setStatusCode(400);
-                    reqRes.setMessage("Cannot update: The new identification is already in use");
-                    return reqRes;
-                }
-
-                existingUser.setIdentification(updatedUser.getIdentification());
-                existingUser.setEmail(updatedUser.getEmail());
-                existingUser.setName(updatedUser.getName());
-                existingUser.setCity(updatedUser.getCity());
-                existingUser.setRole(updatedUser.getRole());
-                existingUser.setPosition(updatedUser.getPosition());
-
-                if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-                    existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-                }
-
-                OurUsers savedUser = usersRepo.save(existingUser);
-                reqRes.setOurUsers(savedUser);
+                usersRepo.save(existingUser);
                 reqRes.setStatusCode(200);
-                reqRes.setMessage("User updated successfully");
+                reqRes.setMessage("Contraseña actualizada con éxito.");
             } else {
                 reqRes.setStatusCode(404);
-                reqRes.setMessage("User not found for update");
+                reqRes.setMessage("Usuario no encontrado.");
             }
         } catch (Exception e) {
             reqRes.setStatusCode(500);
-            reqRes.setMessage("Error occurred while updating user: " + e.getMessage());
+            reqRes.setMessage("Error al actualizar la contraseña: " + e.getMessage());
         }
         return reqRes;
     }

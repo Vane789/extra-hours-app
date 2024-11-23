@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "extrahours", schema = "amadeusbd")
@@ -18,14 +20,14 @@ public class ExtraHours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "startdatetime")
-    private LocalDateTime startdatetime;
+    @Column(name = "date")
+    private LocalDate date;
 
-    @Column(name = "enddatetime")
-    private LocalDateTime enddatetime;
+    @Column(name = "startime")
+    private LocalTime startime;
 
-    @Column(name = "amountextrahours", precision = 5, scale = 2)
-    private BigDecimal amountextrahours;
+    @Column(name = "endtime")
+    private LocalTime endtime;
 
     @Column(name = "comments", columnDefinition = "TEXT")
     private String comments;

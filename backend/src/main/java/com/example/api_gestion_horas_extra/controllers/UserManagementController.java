@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserManagementController {
@@ -47,12 +49,29 @@ public class UserManagementController {
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @PutMapping("/admin/users/{identification}")
-    public ResponseEntity<ReqRes> updateUser(
+    @PutMapping("/users/password/{identification}")
+    public ResponseEntity<ReqRes> updatePassword(
             @PathVariable String identification,
-            @RequestBody OurUsers updatedUser) {
-        ReqRes response = usersManagementService.updateUserByIdentification(identification, updatedUser);
-        return ResponseEntity.status(response.getStatusCode()).body(response);
+            @RequestBody Map<String, String> request) {
+        ReqRes reqRes = new ReqRes();
+
+        try {
+            String newPassword = request.get("password");
+
+            if (newPassword == null || newPassword.isEmpty()) {
+                reqRes.setStatusCode(400);
+                reqRes.setMessage("La nueva contraseña no puede estar vacía.");
+                return ResponseEntity.badRequest().body(reqRes);
+            }
+
+            ReqRes response = usersManagementService.updatePasswordByIdentification(identification, newPassword);
+            return ResponseEntity.status(response.getStatusCode()).body(response);
+
+        } catch (Exception e) {
+            reqRes.setStatusCode(500);
+            reqRes.setMessage("Error al actualizar la contraseña: " + e.getMessage());
+            return ResponseEntity.status(500).body(reqRes);
+        }
     }
 
     @DeleteMapping("/admin/users/{identification}")
