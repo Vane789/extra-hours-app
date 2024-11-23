@@ -1,23 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Cascader } from "antd"; 
 import { addExtraHour } from "@service/addExtraHour";
 import { EmployeeInfo } from "../EmployeeInfo/EmployeeInfo";
 import "./FormExtraHour.scss";
 import { determineExtraHourType } from "@utils/extraHourCalculator";
 import { toast } from 'react-toastify';
+import { AuthContext } from '../../components/context/AuthContext';
 
 const options = [
   {
     value: "Server Patching Cycle",
     label: "Server Patching Cycle",
+    id: 1
   },
   {
     value: "Zabbix, doker001",
     label: "Zabbix, doker001",
+    id: 2
   },
   {
     value: "NICC-076817",
     label: "NICC-076817",
+    id: 3
   },
 ];
 
@@ -34,7 +38,7 @@ export const FormExtraHour = () => {
     date: "",
     startime: "",
     endtime: "",
-    extrahourtype: "",
+    extrahourtype: {},
     totalextrahour: 0,
     comments: "",
     incident: "",
@@ -44,6 +48,7 @@ export const FormExtraHour = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resetEmployeeInfo, setResetEmployeeInfo] = useState(false);
+  const { auth } =  useContext(AuthContext);
 
   const handleIdChange = (id) => {
     setExtraHours((prevData) => ({
@@ -54,9 +59,6 @@ export const FormExtraHour = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log("extrahours handleChange " , extraHours)
-    console.log("handleChange name -< " , name)
-    console.log("handleChange value -< " , value)
     setExtraHours((prevData) => ({
       ...prevData,
       [name]: value,
@@ -65,9 +67,10 @@ export const FormExtraHour = () => {
 
   // Maneja los cambios del componente Cascader
   const handleCascaderChange = (value) => {
+    const incidentId = options.find( incident => incident.value == value[0]) 
     setExtraHours((prevData) => ({
       ...prevData,
-      incident: value.join(" > "), // Une los valores seleccionados
+      incident: incidentId.id, // Une los valores seleccionados
     }));
   };
 
@@ -75,28 +78,35 @@ export const FormExtraHour = () => {
     return {
       diurnal: {
         name: "diurnal",
-        porcentage: 0.5
+        porcentage: 0.5,
+        id: 1
       },
       nocturnal: {
         name: "nocturnal",
-        porcentage: 0.75
+        porcentage: 0.75,
+        id: 2
       },
       diurnalHoliday: {
         name: "diurnalHoliday",
-        porcentage: 1.0
+        porcentage: 1.0,
+        id: 3
       },
       nocturnalHoliday: {
         name: "nocturnalHoliday",
-        porcentage: 1.5
+        porcentage: 1.5,
+        id: 4
       },
     }[value[0]];
   }
-
+  
   const handleExtraHourTypeChange = (value) => {
     setExtraHours((prevData) => {
       return {
         ...prevData,
-        extrahourtype: getOptionsTypeHours(value).name,
+        extrahourtype: {
+          name: getOptionsTypeHours(value).name,
+          id: getOptionsTypeHours(value).id,
+        },
         totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
         totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours(value).porcentage * 20000
       }
@@ -121,11 +131,13 @@ export const FormExtraHour = () => {
 
   // useEffect para calcular horas extra automáticamente cuando se cambian los tiempos
   useEffect(() => {
-    if ( extraHours.startime && extraHours.endtime &&  extraHours.extrahourtype) {
+    console.log("useEffect " + extraHours)
+    if ( extraHours.startime && extraHours.endtime && !JSON.stringify(extraHours.extrahourtype) === "{}") {
+      console.log("[extraHours.extrahourtype.name " , extraHours.extrahourtype )
       setExtraHours((prevData) => ({
         ...prevData,
         totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
-        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours([extraHours.extrahourtype]).porcentage * 20000
+        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours([extraHours.extrahourtype.name]).porcentage * 20000
 
       }));
     }
@@ -159,7 +171,7 @@ export const FormExtraHour = () => {
     //   ...totalextrahour,
     // };
     try {
-      //await addExtraHour(body);
+      await addExtraHour(extraHours, auth);
       toast.success("Horas extras agregadas exitosamente");
 
       // setExtraHours({
