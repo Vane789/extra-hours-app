@@ -3,19 +3,30 @@ import { Form, Input, Button } from "antd";
 import "./LoginPage.scss";
 import amadeus from "../../assets/images/amadeus.png";
 import { AuthContext } from '../context/AuthContext';
+import { toast } from 'react-toastify';
+
 // import Footer from "../common/Footer";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error] = useState('');
   const { login } = useContext(AuthContext);
   
   const handleSubmit = async (values) => {
     try {
-      await login(values.email, values.password); 
+      await login(values.email, values.password);
+      toast.success("Bienvenido a Amadeus",{
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+      });
     } catch (error) {
-      setError("Login failed");
+      toast.error("Login failed, please try again", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+      });
     }
   };
 

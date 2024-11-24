@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Input, Table, Button, Modal, message } from "antd";
-import { findEmployee } from "@services/findEmployee";
-import { findExtraHour } from "@services/findExtraHour";
-import { postExtraHourToJSON } from "@services/postExtraHourToJSON";
-import { deleteExtraHour } from "../../services/deleteExtraHour";
+import { findEmployee } from "@service/findEmployee";
+import { findExtraHour } from "@service/findExtraHour";
+import { postExtraHourToJSON } from "@service/postExtraHourToJSON";
+import { deleteExtraHour } from "../../service/deleteExtraHour";
 import { columns as staticColumns } from "@utils/tableColumns";
 import "./Approve.scss";
 

@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import UserService from '../service/UserService';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,19 @@ export const AuthProvider = ({ children }) => {
         email: localStorage.getItem('email'),
     });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        const email = localStorage.getItem('email');
+        const name = localStorage.getItem('name');
+        
+        if (token) {
+            setAuth({ token, role, email, name });
+        } else {
+            setAuth({ token: null, role: null, email: null, name: null });
+        }
+    }, []);
 
     const isAuthenticated = () => {
         return !!auth.token;
@@ -27,10 +40,14 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('role', userData.role);
                 localStorage.setItem('email', email);
 
+                const profile = await UserService.getYourProfile(userData.token);
+                localStorage.setItem('name', profile.name);
+
                 setAuth({ 
                     token: userData.token, 
                     role: userData.role, 
-                    email: email 
+                    email: email,
+                    name: profile.name,
                 });
 
                 console.log("Login exitoso, rol:", userData.role);
@@ -57,9 +74,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         console.log("Ejecutando logout");
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('email');
+        localStorage.removeItem("authToken"); 
         
         setAuth({ 
             token: null, 

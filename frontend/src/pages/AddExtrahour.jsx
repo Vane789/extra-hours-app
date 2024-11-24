@@ -1,18 +1,23 @@
 import "./AddExtrahour.scss";
 import { FormExtraHour } from "../components/FormExtraHour/FormExtraHour";
 import home from "../assets/images/home.png";
+import { Link } from "react-router-dom";
+import { Typography } from "antd"; 
+
+const { Title } = Typography; 
 
 const AddExtrahour = () => {
+  const pageTitle = "Agregar Horas Extras";
+
   return (
     <>
       <div>
         <header className="page__header">
-       
-          <a href="http://localhost:5173/menu">
-          <img className="home" src={home} alt="home" />
-          </a>
+          <Link to="/menu">
+            <img className="home" src={home} alt="home" />
+          </Link>
         </header>
-        <h2 className="title">Agregar horas extra</h2>
+        <Title level={2} className="title">{pageTitle}</Title>
         <FormExtraHour className="addhour" />
       </div>
     </>

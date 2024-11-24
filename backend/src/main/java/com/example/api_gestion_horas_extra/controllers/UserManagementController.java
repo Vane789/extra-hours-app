@@ -2,6 +2,7 @@ package com.example.api_gestion_horas_extra.controllers;
 
 import com.example.api_gestion_horas_extra.dto.ReqRes;
 import com.example.api_gestion_horas_extra.entity.OurUsers;
+import com.example.api_gestion_horas_extra.entity.Role;
 import com.example.api_gestion_horas_extra.services.UsersManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,53 +10,96 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
+@RequestMapping("/api/v1")
 public class UserManagementController {
+
     @Autowired
     private UsersManagementService usersManagementService;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<ReqRes> register(@RequestBody ReqRes reg){
-        return ResponseEntity.ok(usersManagementService.register(reg));
+    public ResponseEntity<ReqRes> register(@RequestBody ReqRes registrationRequest) {
+        ReqRes response = usersManagementService.register(registrationRequest);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ReqRes> login(@RequestBody ReqRes req){
-        return ResponseEntity.ok(usersManagementService.login(req));
+    public ResponseEntity<ReqRes> login(@RequestBody ReqRes loginRequest) {
+        ReqRes response = usersManagementService.login(loginRequest);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes req){
-        return ResponseEntity.ok(usersManagementService.refreshToken(req));
+    public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes refreshTokenRequest) {
+        ReqRes response = usersManagementService.refreshToken(refreshTokenRequest);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @GetMapping("/admin/get-all-users")
-    public ResponseEntity<ReqRes> getAllUsers(){
-        return ResponseEntity.ok(usersManagementService.getAllUsers());
-
+    @GetMapping("/admin/users")
+    public ResponseEntity<ReqRes> getAllUsers() {
+        ReqRes response = usersManagementService.getAllUsers();
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @GetMapping("/admin/get-users/{userId}")
-    public ResponseEntity<ReqRes> getUSerByID(@PathVariable Integer userId){
-        return ResponseEntity.ok(usersManagementService.getUsersById(userId));
-
+    @GetMapping("/admin/users/{identification}")
+    public ResponseEntity<ReqRes> getUserByIdentification(@PathVariable String identification) {
+        ReqRes response = usersManagementService.getUserByIdentification(identification);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @PutMapping("/admin/update/{userId}")
-    public ResponseEntity<ReqRes> updateUser(@PathVariable Integer userId, @RequestBody OurUsers reqres){
-        return ResponseEntity.ok(usersManagementService.updateUser(userId, reqres));
+    @PutMapping("/users/password/{identification}")
+    public ResponseEntity<ReqRes> updatePassword(
+            @PathVariable String identification,
+            @RequestBody Map<String, String> request) {
+        ReqRes reqRes = new ReqRes();
+
+        try {
+            String newPassword = request.get("password");
+
+            if (newPassword == null || newPassword.isEmpty()) {
+                reqRes.setStatusCode(400);
+                reqRes.setMessage("La nueva contraseña no puede estar vacía.");
+                return ResponseEntity.badRequest().body(reqRes);
+            }
+
+            ReqRes response = usersManagementService.updatePasswordByIdentification(identification, newPassword);
+            return ResponseEntity.status(response.getStatusCode()).body(response);
+
+        } catch (Exception e) {
+            reqRes.setStatusCode(500);
+            reqRes.setMessage("Error al actualizar la contraseña: " + e.getMessage());
+            return ResponseEntity.status(500).body(reqRes);
+        }
     }
 
-    @GetMapping("/adminuser/get-profile")
-    public ResponseEntity<ReqRes> getMyProfile(){
+    @DeleteMapping("/admin/users/{identification}")
+    public ResponseEntity<ReqRes> deleteUser(@PathVariable String identification) {
+        ReqRes response = usersManagementService.deleteUserByIdentification(identification);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
+    }
+
+    @GetMapping("/adminuser/profile")
+    public ResponseEntity<ReqRes> getMyProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         ReqRes response = usersManagementService.getMyInfo(email);
-        return  ResponseEntity.status(response.getStatusCode()).body(response);
+        return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @DeleteMapping("/admin/delete/{userId}")
-    public ResponseEntity<ReqRes> deleteUSer(@PathVariable Integer userId){
-        return ResponseEntity.ok(usersManagementService.deleteUser(userId));
-    }
+//    @PutMapping("/user/profile")
+//    public ResponseEntity<ReqRes> updateMyProfile(@RequestBody OurUsers updatedUser) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+//        ReqRes userInfo = usersManagementService.getMyInfo(email);
+//
+//        if (userInfo.getStatusCode() == 200 && userInfo.getOurUsers() != null) {
+//            String identification = userInfo.getOurUsers().getIdentification();
+//            ReqRes response = usersManagementService.updateUserByIdentification(identification, updatedUser);
+//            return ResponseEntity.status(response.getStatusCode()).body(response);
+//        }
+//
+//        return ResponseEntity.status(404).body(userInfo);
+//    }
 }

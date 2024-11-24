@@ -1,0 +1,48 @@
+@use './variables' as *;
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin hover-link {
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($amadeus-secondary, 0.1);
+    transform: translateX(5px);
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-hover {
+  transition: all 0.3s ease;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $screen-xs) { @content; }
+  }
+  @if $breakpoint == sm {
+    @media (min-width: $screen-sm) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (min-width: $screen-md) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (min-width: $screen-lg) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (min-width: $screen-xl) { @content; }
+  }
+}

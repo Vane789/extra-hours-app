@@ -1,7 +1,7 @@
 import axios from "axios";
 
 class UserService {
-    static BASE_URL = "http://localhost:8080";
+    static BASE_URL = "http://localhost:8080/api/v1";
 
     static getAuthHeaders(token) {
         return { Authorization: `Bearer ${token}` };
@@ -27,9 +27,9 @@ class UserService {
     }
 
     static async getYourProfile(token) {
-        return axios.get(`${this.BASE_URL}/user/get-profile`, {
+        return axios.get(`${this.BASE_URL}/adminuser/profile`, {
             headers: this.getAuthHeaders(token),
-        }).then(response => response.data);
+        }).then(response => response.data.ourUsers); 
     }
 
     static async getUserById(userId, token) {

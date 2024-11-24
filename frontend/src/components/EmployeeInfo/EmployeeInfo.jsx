@@ -2,7 +2,7 @@ import { Input } from "antd";
 import { useState, useEffect } from "react";
 import "./EmployeeInfo.scss";
 const { Search } = Input;
-import { findEmployee } from "@services/findEmployee";
+import { findEmployee } from "@service/findEmployee";
 import PropTypes from "prop-types";
 
 export const EmployeeInfo = ({ onIdChange, reset, setReset }) => {
@@ -38,7 +38,12 @@ export const EmployeeInfo = ({ onIdChange, reset, setReset }) => {
 
   return (
     <div className="Info">
+<<<<<<< HEAD
     
+=======
+      
+
+>>>>>>> c7ea2e68bded6d0fdc6f9172b8ba9fdaa8d94093
       {!!Object.keys(employee).length && (
         <div className="detailsInfo">
           <div className="description-item">
