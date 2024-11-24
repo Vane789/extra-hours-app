@@ -1,12 +1,17 @@
-export const findEmployee = async (id) => {
+import axios from 'axios';
+
+export const findEmployee = async (employeeId) => {
+  const token = localStorage.getItem('token'); 
+
   try {
-    const response = await fetch(`http://localhost:4000/employee-info/${id}`);
-    const data = await response.json();
-
-    return data;
+    const response = await axios.get(`http://localhost:8080/api/v1/admin/users/${employeeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.ourUsers;
   } catch (error) {
-    console.error(error);
-
+    console.error("Error en findEmployee:", error);
     throw error;
   }
 };

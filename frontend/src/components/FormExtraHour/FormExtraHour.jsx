@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { Cascader } from "antd"; 
 import { addExtraHour } from "@service/addExtraHour";
+import { getHoursType } from "@service/getHoursType";
 import { EmployeeInfo } from "../EmployeeInfo/EmployeeInfo";
 import "./FormExtraHour.scss";
-import { determineExtraHourType } from "@utils/extraHourCalculator";
+import { extraHourCalculator } from "@utils/extraHourCalculator";
 import { toast } from 'react-toastify';
 import { AuthContext } from '../../components/context/AuthContext';
 
@@ -25,16 +26,16 @@ const options = [
   },
 ];
 
-const extraHourTypes = [
-  { value: "diurnal", label: "Diurna (50%)" },
-  { value: "nocturnal", label: "Nocturna (75%)" },
-  { value: "diurnalHoliday", label: "Diurna Festiva (100%)" },
-  { value: "nocturnalHoliday", label: "Nocturna Festiva (150%)" },
-];
+// const extraHourTypes = [
+//   { value: "diurnal", label: "Diurna (50%)" },
+//   { value: "nocturnal", label: "Nocturna (75%)" },
+//   { value: "diurnalHoliday", label: "Diurna Festiva (100%)" },
+//   { value: "nocturnalHoliday", label: "Nocturna Festiva (150%)" },
+// ];
 
 export const FormExtraHour = () => {
   const [extraHours, setExtraHours] = useState({
-    id: "id-usuario",
+    id: "",
     date: "",
     startime: "",
     endtime: "",
@@ -45,10 +46,35 @@ export const FormExtraHour = () => {
     totalpayment: 0
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [resetEmployeeInfo, setResetEmployeeInfo] = useState(false);
+  const [ loading, setLoading ] = useState(false);
+  const [ error, setError ] = useState(null);
+  const [ resetEmployeeInfo, setResetEmployeeInfo ] = useState(false);
+  const [ dataSearchingEmpleyee, setDataSearchingEmpleyee ] = useState();
+  const [extraHourTypes, setExtraHourTypes] = useState([]); 
+
   const { auth } =  useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchHourTypes = async () => {
+      try {
+        const data = await getHoursType();
+        const formattedData = data.map(item => ({
+          value: item.id.toString(),
+          label: `${item.description} (${item.percentage}%)`,
+          percentage: item.percentage,
+          description: item.description
+        }));
+        setExtraHourTypes(formattedData);
+      } catch (error) {
+        console.error("Error al cargar los tipos de horas", error);
+        toast.error("Error al cargar los tipos de horas");
+      }
+    };
+
+    fetchHourTypes();
+  }, []);
+
+  console.log("auth ------------> " , auth.role)
 
   const handleIdChange = (id) => {
     setExtraHours((prevData) => ({
@@ -100,17 +126,22 @@ export const FormExtraHour = () => {
   }
   
   const handleExtraHourTypeChange = (value) => {
-    setExtraHours((prevData) => {
-      return {
-        ...prevData,
-        extrahourtype: {
-          name: getOptionsTypeHours(value).name,
-          id: getOptionsTypeHours(value).id,
-        },
-        totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
-        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours(value).porcentage * 20000
-      }
-    });
+    const selectedType = extraHourTypes.find(type => type.value === value[0]);
+    if (!selectedType) return;
+
+    const totalHours = calculateExtraHours(extraHours.startime, extraHours.endtime);
+    const payment = totalHours * (selectedType.percentage / 100) * 20000;
+
+    setExtraHours(prevData => ({
+      ...prevData,
+      extrahourtype: {
+        id: parseInt(selectedType.value),
+        description: selectedType.description,
+        percentage: selectedType.percentage
+      },
+      totalextrahour: totalHours,
+      totalpayment: payment
+    }));
   };
 
   const calculateExtraHours = (startTime, endTime) => {
@@ -131,14 +162,14 @@ export const FormExtraHour = () => {
 
   // useEffect para calcular horas extra automáticamente cuando se cambian los tiempos
   useEffect(() => {
-    console.log("useEffect " + extraHours)
-    if ( extraHours.startime && extraHours.endtime && !JSON.stringify(extraHours.extrahourtype) === "{}") {
-      console.log("[extraHours.extrahourtype.name " , extraHours.extrahourtype )
-      setExtraHours((prevData) => ({
-        ...prevData,
-        totalextrahour: calculateExtraHours(extraHours.startime, extraHours.endtime),
-        totalpayment: calculateExtraHours(extraHours.startime, extraHours.endtime) * getOptionsTypeHours([extraHours.extrahourtype.name]).porcentage * 20000
+    if (extraHours.startime && extraHours.endtime && extraHours.extrahourtype.id) {
+      const totalHours = calculateExtraHours(extraHours.startime, extraHours.endtime);
+      const payment = totalHours * (extraHours.extrahourtype.percentage / 100) * 20000;
 
+      setExtraHours(prevData => ({
+        ...prevData,
+        totalextrahour: totalHours,
+        totalpayment: payment
       }));
     }
   }, [extraHours.startime, extraHours.endtime]);
@@ -150,7 +181,11 @@ export const FormExtraHour = () => {
   //   }
   // }, [extraHours.totalextrahour]);
 
-  
+  useEffect(() => {
+
+    console.log("test ----> " , dataSearchingEmpleyee)
+
+  }, [dataSearchingEmpleyee]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -158,6 +193,12 @@ export const FormExtraHour = () => {
     setError(null);
 
     console.log("informacion de todo el formulario --> "  , extraHours)
+    console.log("resetEmployeeInfo " , dataSearchingEmpleyee)
+    if(dataSearchingEmpleyee) {
+      console.log("Informacion de una persona como ADMIN ", dataSearchingEmpleyee)
+    } else {
+      console.log("No consulto a nadie")
+    }
     // Asegurar el cálculo antes de enviar
     // determineExtraHourType(
     //   extraHours.date,
@@ -171,7 +212,10 @@ export const FormExtraHour = () => {
     //   ...totalextrahour,
     // };
     try {
-      await addExtraHour(extraHours, auth);
+      if (!extraHours.date || !extraHours.startime || !extraHours.endtime || !extraHours.extrahourtype.id) {
+        throw new Error("Por favor complete todos los campos requeridos");
+      }
+      await addExtraHour(extraHours, auth, dataSearchingEmpleyee );
       toast.success("Horas extras agregadas exitosamente");
 
       // setExtraHours({
@@ -194,13 +238,18 @@ export const FormExtraHour = () => {
     }
   };
 
+  const isAdminOrManager = auth.role === 'ADMIN' || auth.role === 'MANAGER';
+
   return (
     <form onSubmit={handleSubmit}>
+      {isAdminOrManager && (
       <EmployeeInfo
         onIdChange={handleIdChange}
+        setDataSearchingEmpleyee = { setDataSearchingEmpleyee }
         reset={resetEmployeeInfo}
         setReset={setResetEmployeeInfo}
       />
+      )}
       <div className="form-group-date-time">
         <div>
           <label htmlFor="date">Fecha</label>
@@ -289,7 +338,7 @@ export const FormExtraHour = () => {
           onChange={handleChange}
         />
       </div>
-      <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading || !dataSearchingEmpleyee && auth.role == "ADMIN"}>
         {loading ? "Enviando..." : "Agregar"}
       </button>
     </form>

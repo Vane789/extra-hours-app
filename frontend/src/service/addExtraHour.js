@@ -1,4 +1,6 @@
-export const addExtraHour = async (body, context) => {
+export const addExtraHour = async (body, context, dataSearchingEmpleyee) => {
+
+  console.log(" dataSearchingEmpleyee ? dataSearchingEmpleyee.id : context.identification " ,  dataSearchingEmpleyee)
 
   const payload  = {
     date: body.date,
@@ -7,7 +9,7 @@ export const addExtraHour = async (body, context) => {
     comments: body.comments,
     totalextrahour: body.totalextrahour,
     totalpayment: body.totalpayment,
-    identification: context.identification,
+    identification: dataSearchingEmpleyee ? dataSearchingEmpleyee.identification : context.identification,
     extrahourtype: body.extrahourtype.id,
     incidentId: body.incident
   }
@@ -30,6 +32,8 @@ export const addExtraHour = async (body, context) => {
       `http://localhost:8080/extrahours`,
       options
     );
+
+    console.log("response " , response)
 
     if (!response.ok) {
       throw new Error("Error en la solicitud");
