@@ -10,7 +10,7 @@ export const addExtraHour = async (body, context, dataSearchingEmpleyee) => {
     totalextrahour: body.totalextrahour,
     totalpayment: body.totalpayment,
     identification: dataSearchingEmpleyee ? dataSearchingEmpleyee.identification : context.identification,
-    extrahourtype: body.extrahourtype.id,
+    extrahourtype: body.extrahourtype,
     incidentId: body.incident
   }
 

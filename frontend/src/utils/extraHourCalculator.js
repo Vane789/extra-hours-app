@@ -1,99 +1,187 @@
-// import Holiday from "date-holidays";
+// // extraHourCalculator.js
 
-// const hd = new Holiday("CO");
+// import Holidays from 'date-holidays';
 
-export const determineExtraHourType = (
-  date,
-  startTime,
-  endTime,
-  setError,
-  setExtraHours
-) => {
-  const startDateTime = new Date(`${date}T${startTime}`);
-  const endDateTime = new Date(`${date}T${endTime}`);
+// const HOUR_IN_MINUTES = 60;
+// const REGULAR_WORKDAY_START = '06:00';
+// const REGULAR_WORKDAY_END = '21:00';
+// const MINIMUM_EXTRA_MINUTES = 15;
+// const WORKING_DAYS_PER_MONTH = 30;
+// const WORKING_HOURS_PER_DAY = 8;
 
-  // Verificación para evitar que la hora de fin sea anterior a la de inicio
-  if (endDateTime <= startDateTime) {
-    setError("La hora de fin debe ser posterior a la hora de inicio.");
-    return;
-  }
+// const hd = new Holidays('CO');
 
-  let current = new Date(startDateTime);
-  let diurnal = 0,
-    nocturnal = 0,
-    diurnalHoliday = 0,
-    nocturnalHoliday = 0;
+// /**
+//  * Calcula la tarifa por hora basada en el salario mensual
+//  * @param {number} monthlySalary - Salario mensual del empleado
+//  * @returns {number} Tarifa por hora
+//  */
+// const calculateHourlyRate = (monthlySalary) => {
+//   return monthlySalary / (WORKING_DAYS_PER_MONTH * WORKING_HOURS_PER_DAY);
+// };
 
-  // Función para manejar horas extras según su tipo
-  const handleExtraHours = (isHoliday, hoursDiff, isNight) => {
-    if (isHoliday) {
-      if (isNight) {
-        nocturnalHoliday += hoursDiff; // Sumar a nocturnalHoliday
-      } else {
-        diurnalHoliday += hoursDiff; // Sumar a diurnalHoliday
-      }
-    } else {
-      if (isNight) {
-        nocturnal += hoursDiff; // Sumar a nocturnal
-      } else {
-        diurnal += hoursDiff; // Sumar a diurnal
-      }
-    }
-  };
+// /**
+//  * Convierte una hora en formato HH:mm a minutos
+//  */
+// const timeToMinutes = (time) => {
+//   const [hours, minutes] = time.split(':').map(Number);
+//   return hours * HOUR_IN_MINUTES + minutes;
+// };
 
-  // while (current < endDateTime) {
-  //   // const isHoliday = hd.isHoliday(current) || current.getDay() === 0; // Verificar si la hora actual es festiva
-  //   const hour = current.getHours();
-  //   const minutes = current.getMinutes();
-  //   const nextHour = new Date(current);
-  //   nextHour.setHours(current.getHours() + 1);
-  //   const actualEnd = nextHour > endDateTime ? endDateTime : nextHour;
+// /**
+//  * Verifica si una hora está dentro del rango diurno (6:00 - 21:00)
+//  */
+// const isDaytime = (time) => {
+//   const minutes = timeToMinutes(time);
+//   return minutes >= timeToMinutes(REGULAR_WORKDAY_START) && 
+//          minutes <= timeToMinutes(REGULAR_WORKDAY_END);
+// };
 
-  //   // Calcular la diferencia directamente en horas
-  //   const hoursDiff = (actualEnd - current) / 1000 / 60 / 60;
+// /**
+//  * Verifica si una fecha es festivo o domingo
+//  * @param {string} date - Fecha en formato YYYY-MM-DD
+//  * @returns {boolean}
+//  */
+// const isHoliday = (date) => {
+//   const dateObj = new Date(date);
+//   // Verificar si es domingo (0 = domingo)
+//   const isSunday = dateObj.getDay() === 0;
+//   // Verificar si es festivo usando la librería
+//   const isHolidayDate = hd.isHoliday(dateObj);
+  
+//   return isSunday || isHolidayDate;
+// };
 
-  //   // Calcular horas diurnas (de 6:00 AM a 9:00 PM)
-  //   if (hour >= 6 && hour < 21) {
-  //     if (hour === 20) {
-  //       // Si estamos entre las 8:00 PM y las 9:00 PM
-  //       const remainingMinutes = 21 * 60 - (hour * 60 + minutes); // Minutos restantes hasta las 9:00 PM
-  //       const remainingHours = remainingMinutes / 60; // Convertir minutos restantes a horas
+// /**
+//  * Obtiene el nombre del festivo si aplica
+//  * @param {string} date - Fecha en formato YYYY-MM-DD
+//  * @returns {string|null}
+//  */
+// const getHolidayName = (date) => {
+//   const dateObj = new Date(date);
+//   const holiday = hd.isHoliday(dateObj);
+//   if (holiday && holiday.length > 0) {
+//     return holiday[0].name;
+//   }
+//   if (dateObj.getDay() === 0) {
+//     return 'Domingo';
+//   }
+//   return null;
+// };
 
-  //       // handleExtraHours(isHoliday, remainingHours, false); // Sumar a diurna o festiva diurna
-  //       const nocturnalHours = hoursDiff - remainingHours;
-  //       if (nocturnalHours > 0) {
-  //         handleExtraHours(isHoliday, nocturnalHours, true); // Sumar a nocturna o festiva nocturna
-  //       }
-  //     } else {
-  //       handleExtraHours(isHoliday, hoursDiff, false); // Sumar horas diurnas
-  //     }
-  //   } else if (hour >= 21 || hour < 6) {
-  //     if (hour < 6 && hour === 5) {
-  //       const remainingMinutes = 6 * 60 - (hour * 60 + minutes);
-  //       const remainingHours = remainingMinutes / 60;
+// /**
+//  * Redondea los minutos según la normativa
+//  */
+// const roundMinutes = (minutes) => {
+//   if (minutes < MINIMUM_EXTRA_MINUTES) return 0;
+//   if (minutes <= 45) return 30;
+//   return HOUR_IN_MINUTES;
+// };
 
-  //       handleExtraHours(isHoliday, remainingHours, true); // Sumar a nocturna o festiva nocturna
-  //       const diurnalHours = hoursDiff - remainingHours;
-  //       if (diurnalHours > 0) {
-  //         handleExtraHours(isHoliday, diurnalHours, false); // Sumar a diurna o festiva diurna
-  //       }
-  //     } else {
-  //       handleExtraHours(isHoliday, hoursDiff, true); // Sumar horas nocturnas
-  //     }
-  //   }
+// /**
+//  * Valida los datos de entrada
+//  */
+// const validateInputs = (date, startTime, endTime) => {
+//   const errors = [];
+  
+//   if (!date || !startTime || !endTime) {
+//     errors.push('Todos los campos son obligatorios');
+//   }
 
-  //   current = nextHour; // Avanzar a la siguiente hora
-  // }
+//   const start = timeToMinutes(startTime);
+//   const end = timeToMinutes(endTime);
+  
+//   if (end <= start) {
+//     errors.push('La hora de fin debe ser posterior a la hora de inicio');
+//   }
 
-  const extrasHours = diurnal + nocturnal + diurnalHoliday + nocturnalHoliday;
+//   const today = new Date();
+//   const inputDate = new Date(date);
+//   if (inputDate > today) {
+//     errors.push('No se pueden registrar horas extras para fechas futuras');
+//   }
 
-  // Actualiza el estado con el valor redondeado a 2 decimales
-  setExtraHours((prevData) => ({
-    ...prevData,
-    diurnal: diurnal.toFixed(2),
-    nocturnal: nocturnal.toFixed(2),
-    diurnalHoliday: diurnalHoliday.toFixed(2),
-    nocturnalHoliday: nocturnalHoliday.toFixed(2),
-    extrasHours: extrasHours.toFixed(2),
-  }));
-};
+//   // Validar máximo de horas extras según el tipo de día
+//   const totalHours = (end - start) / HOUR_IN_MINUTES;
+//   const maxHours = isHoliday(date) ? 12 : 10; // 12 horas en festivos, 10 en días normales
+//   if (totalHours > maxHours) {
+//     errors.push(`No se pueden registrar más de ${maxHours} horas extras por día`);
+//   }
+
+//   return errors;
+// };
+
+// /**
+//  * Calcula el tipo de hora extra y su factor de multiplicación
+//  */
+// const calculateExtraHourFactor = (date, time, extraHourTypes) => {
+//   const isDayTime = isDaytime(time);
+//   const isHolidayDay = isHoliday(date);
+  
+//   return extraHourTypes.find(type => {
+//     if (isDayTime && !isHolidayDay && type.label.includes('50%')) return true;
+//     if (!isDayTime && !isHolidayDay && type.label.includes('75%')) return true;
+//     if (isDayTime && isHolidayDay && type.label.includes('100%')) return true;
+//     if (!isDayTime && isHolidayDay && type.label.includes('150%')) return true;
+//     return false;
+//   });
+// };
+
+// /**
+//  * Calcula las horas extras y el pago correspondiente
+//  * @param {string} startTime - Hora inicio (HH:mm)
+//  * @param {string} endTime - Hora fin (HH:mm)
+//  * @param {string} date - Fecha (YYYY-MM-DD)
+//  * @param {number} monthlySalary - Salario mensual del empleado
+//  * @param {Array} extraHourTypes - Tipos de horas extras
+//  * @returns {Object} Resultado del cálculo
+//  */
+// export const calculateExtraHours = (startTime, endTime, date, monthlySalary, extraHourTypes) => {
+//   // Validar inputs
+//   const errors = validateInputs(date, startTime, endTime);
+//   if (errors.length > 0) {
+//     throw new Error(errors.join('. '));
+//   }
+
+//   if (!monthlySalary || monthlySalary <= 0) {
+//     throw new Error('El salario base es requerido para el cálculo');
+//   }
+
+//   const startMinutes = timeToMinutes(startTime);
+//   const endMinutes = timeToMinutes(endTime);
+//   let totalMinutes = endMinutes - startMinutes;
+  
+//   // Redondear minutos según la normativa
+//   totalMinutes = roundMinutes(totalMinutes);
+//   const totalHours = totalMinutes / HOUR_IN_MINUTES;
+
+//   // Calcular tarifa por hora
+//   const hourlyRate = calculateHourlyRate(monthlySalary);
+
+//   // Determinar el tipo de hora extra y factor
+//   const extraHourType = calculateExtraHourFactor(date, startTime, extraHourTypes);
+//   const percentage = parseFloat(extraHourType.label.match(/\(([^)]+)\)/)[1]) / 100;
+
+//   // Calcular el pago
+//   const basePayment = totalHours * hourlyRate;
+//   const extraPayment = basePayment * (percentage - 1);
+//   const totalPayment = basePayment + extraPayment;
+
+//   // Obtener información del festivo si aplica
+//   const holidayName = getHolidayName(date);
+
+//   return {
+//     hours: totalHours,
+//     extraHourType,
+//     payment: totalPayment,
+//     details: {
+//       isHoliday: isHoliday(date),
+//       holidayName,
+//       isDaytime: isDaytime(startTime),
+//       percentage,
+//       hourlyRate,
+//       basePayment,
+//       extraPayment
+//     }
+//   };
+// };
