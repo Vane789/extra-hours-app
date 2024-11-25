@@ -1,13 +1,15 @@
 .Info {
   .search-container {
-    display: flex;
-    justify-content: flex-start;
-    margin-left: 0;
-    padding: 30px;
-    width: 100%;
-
+    // display: flex;
+    // justify-content: flex-start;
+    width: 20%;
+    // padding: 12px;
+    
     .ant-input-search {
-      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
     }
     #textoerror {
       color: #3a8bff;
@@ -17,8 +19,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px auto;
-    flex-wrap: wrap;
+    margin-bottom: 50px;
+    // flex-wrap: wrap;
     gap: 20px;
 
     .description-item {
@@ -35,7 +37,7 @@
       }
 
       .description {
-        color: #ccc;
+        color: #3a3a3a;
         font-family: Arial, Helvetica, sans-serif;
       }
     }

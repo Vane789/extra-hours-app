@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ExtraHoursMenu from "./components/ExtraHoursMenu";
 import LoginPage from "./components/auth/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ApprovePage from "./pages/ApprovePage";
@@ -36,6 +37,7 @@ const ROUTE_ROLES = {
   "/update": ["ADMIN"],
   "/delete": ["ADMIN"],
   "/settings": ["ADMIN"],
+  "/profile": ["USER", "ADMIN"],
 };
 
 const routeComponents = {
@@ -45,6 +47,7 @@ const routeComponents = {
   "/update": PayExtraHoursPage,
   "/delete": DeleteExtrahour,
   "/settings": SettingsPage,
+  "/profile": ProfilePage,
 };
 
 function App() {

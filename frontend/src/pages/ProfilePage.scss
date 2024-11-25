@@ -1,0 +1,71 @@
+.profile-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  
+    h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      color: #333;
+    }
+  
+    .profile-form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+      .form-group {
+        margin-bottom: 1.5rem;
+  
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+          color: #555;
+        }
+  
+        input {
+          width: 100%;
+          padding: 0.8rem;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 1rem;
+  
+          &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+          }
+        }
+      }
+  
+      .btn-submit {
+        background-color: #007bff;
+        color: white;
+        padding: 0.8rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+  
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+  
+      .message {
+        margin-top: 1rem;
+        color: #d9534f;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  

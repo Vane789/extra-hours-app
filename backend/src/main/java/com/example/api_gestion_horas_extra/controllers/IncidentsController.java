@@ -1,6 +1,6 @@
 package com.example.api_gestion_horas_extra.controllers;
 
-import com.example.api_gestion_horas_extra.entity.Incidents;
+import com.example.api_gestion_horas_extra.dto.IncidentDTO;
 import com.example.api_gestion_horas_extra.services.IncidentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,17 +16,17 @@ public class IncidentsController {
     private IncidentService incidentService;
 
     @GetMapping
-    public ResponseEntity<List<Incidents>> getAllIncidents() {
+    public ResponseEntity<List<IncidentDTO>> getAllIncidents() {
         return ResponseEntity.ok(incidentService.getAllIncidents());
     }
 
     @PostMapping
-    public ResponseEntity<Incidents> createIncident(@RequestBody Incidents incident) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(incidentService.createIncident(incident));
+    public ResponseEntity<IncidentDTO> createIncident(@RequestBody IncidentDTO incidentDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(incidentService.createIncident(incidentDTO));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Incidents>> searchIncidents(@RequestParam String keyword) {
+    public ResponseEntity<List<IncidentDTO>> searchIncidents(@RequestParam String keyword) {
         return ResponseEntity.ok(incidentService.searchIncidents(keyword));
     }
 

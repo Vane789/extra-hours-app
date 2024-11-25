@@ -87,7 +87,7 @@ const ExtraHoursMenu = () => {
 
   const userMenu = (
     <Menu>
-      <Menu.Item key="profile" icon={<UserOutlined />}>
+      <Menu.Item key="profile" icon={<UserOutlined />} onClick={() => navigate('/profile')}>
         Mi Perfil
       </Menu.Item>
       <Menu.Divider />
@@ -96,7 +96,6 @@ const ExtraHoursMenu = () => {
       </Menu.Item>
     </Menu>
   );
-  console.log("Estado auth:", auth);
 
   return (
     <Layout className="extra-hours-layout">

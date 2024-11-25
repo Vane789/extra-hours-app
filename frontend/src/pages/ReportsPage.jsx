@@ -1,8 +1,12 @@
 import "./ReportsPage.scss";
 import { ReportInfo } from "../components/ReportInfo/ReportInfo";
 import home from "../assets/images/home.png";
+import { Typography } from "antd"; 
+
+const { Title } = Typography; 
 
 const Reports = () => {
+  const pageTitle = "Informes";
   return (
     <>
       <header className="page__header">
@@ -10,7 +14,7 @@ const Reports = () => {
           <img className="home" src={home} alt="home" />
           </a>
       </header>
-      <h2>Informes</h2>
+      <Title level={2} className="title">{pageTitle}</Title>
       <ReportInfo />
     </>
   );

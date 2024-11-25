@@ -1,14 +1,6 @@
 @use '@scss/utils/variables' as *;
 @use '@scss/utils/mixins' as *;
 
-// Variables personalizadas para colores y márgenes
-// $primary-color: #010a41;
-// $secondary-color: #3a8bff;
-// $hover-color: #0056b3;
-// $border-color: #ccc;
-// $border-radius: 8px;
-// $transition-speed: 0.3s;
-
 // Mezcla base para inputs
 @mixin input-base {
   width: 100%;

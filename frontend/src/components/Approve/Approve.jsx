@@ -109,7 +109,7 @@ export const Approve = () => {
 
   return (
     <div className="Approve">
-      <div className="search-container">
+      <div className="">
         <Input.Search
           placeholder="Ingrese ID del empleado"
           onSearch={handleSearch}
