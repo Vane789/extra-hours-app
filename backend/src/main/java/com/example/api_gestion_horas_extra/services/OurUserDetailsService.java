@@ -13,6 +13,6 @@ public class OurUserDetailsService implements UserDetailsService {
     private UsersRepo usersRepo;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usersRepo.findByEmail(username).orElseThrow(()->new UsernameNotFoundException("Usuario no encontrado: "+username));
+        return usersRepo.findByEmail(username).orElseThrow();
     }
 }
