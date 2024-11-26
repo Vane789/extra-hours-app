@@ -1,6 +1,7 @@
 package com.example.api_gestion_horas_extra.services;
 
 import com.example.api_gestion_horas_extra.dto.ExtraHoursDTO;
+import com.example.api_gestion_horas_extra.dto.ExtraHoursUserDTO;
 import com.example.api_gestion_horas_extra.entity.ExtraHours;
 import com.example.api_gestion_horas_extra.entity.HourTypes;
 import com.example.api_gestion_horas_extra.entity.Incidents;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExtraHoursService {
@@ -28,6 +30,25 @@ public class ExtraHoursService {
     private HourTypesRepo hourTypesRepo;
     @Autowired
     private IncidentsRepo incidentsRepo;
+
+    public List<ExtraHoursUserDTO> generateReport(){
+        List<ExtraHours> extraHoursList = extraHoursRepo.findAll();
+        return extraHoursList.stream().map(extraHours -> {
+            ExtraHoursUserDTO dto = new ExtraHoursUserDTO();
+            dto.setIdentification(extraHours.getUsers().getIdentification());
+            dto.setName(extraHours.getUsers().getName());
+            dto.setIncident(extraHours.getIncident().getDescription());
+            dto.setDate(extraHours.getDate());
+            dto.setStartTime(extraHours.getStartime());
+            dto.setEndTime(extraHours.getEndtime());
+            dto.setTotalExtraHour(extraHours.getTotalextrahour());
+            dto.setTotalPayment(extraHours.getTotalpayment());
+            dto.setExtraHourType(extraHours.getExtrahourtype().getDescription());
+            dto.setComments(extraHours.getComments());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
 
     public ExtraHours convertDtoToEntity(ExtraHoursDTO extraHoursDTO) {
         ExtraHours extraHours = new ExtraHours();
@@ -58,7 +79,6 @@ public class ExtraHoursService {
         ExtraHours extraHours = convertDtoToEntity(extraHoursDTO);
 
         return extraHoursRepo.save(extraHours);
-
     }
 
     public List<ExtraHours> getAllExtraHours() {
