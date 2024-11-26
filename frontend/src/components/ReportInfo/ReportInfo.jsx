@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Input, Table, DatePicker } from "antd";
-import { findEmployee } from "@service/findEmployee";
-import { findExtraHour } from "@service/findExtraHour";
-import { findExtraHourByDateRange } from "@service/findExtraHourByDateRange";
+import { getExtraHoursReport } from "@service/findEmployee";
+// import { findExtraHour } from "@service/findExtraHour";
+// import { findExtraHourByDateRange } from "@service/findExtraHourByDateRange";
 import ExcelJS from "exceljs";
 import { columns } from "@utils/tableColumns";
 import "./ReportInfo.scss";
+import { toast } from "react-toastify";
+import { Spin } from "antd";
 
 const { RangePicker } = DatePicker;
 
@@ -20,43 +22,49 @@ export const ReportInfo = () => {
     setLoading(true);
     setError(null);
 
+    if (!searchValue) {
+      toast.error("Por favor, ingrese un ID válido.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      let employee = {};
-      let extraHours = [];
-
-      if (searchValue) {
-        const numericIdOrRegistry = parseInt(searchValue, 10);
-        employee = await findEmployee(numericIdOrRegistry);
-
-        extraHours = await findExtraHour(numericIdOrRegistry, "id");
-        if (!extraHours.length) {
-          extraHours = await findExtraHour(numericIdOrRegistry, "registry");
-        }
-      } else if (selectedRange.length === 2) {
-        const [startDate, endDate] = selectedRange;
-        extraHours = await findExtraHourByDateRange(
-          startDate.format("YYYY-MM-DD"),
-          endDate.format("YYYY-MM-DD")
-        );
-      }
-
-      if (extraHours.length > 0) {
-        setEmployeeData(
-          extraHours.map((extraHour) => ({ ...employee, ...extraHour }))
-        );
-      } else {
-        setError(
-          "No se encontraron datos para los criterios de búsqueda proporcionados."
-        );
+      const response = await getExtraHoursReport(searchValue);
+      if (response.length === 0) {
+        toast.error("No se encontraron registros para este ID.");
         setEmployeeData([]);
+      } else {
+        setEmployeeData(response);
       }
-    } catch (error) {
-      setError("Error al buscar los datos. Por favor, intente nuevamente.");
+    } catch (err) {
+      toast.error("Error al buscar los datos. Por favor, intente nuevamente.");
       setEmployeeData([]);
     } finally {
       setLoading(false);
     }
   };
+  // } else if (selectedRange.length === 2) {
+  //   const [startDate, endDate] = selectedRange;
+  //   data = await get(
+  //     startDate.format("YYYY-MM-DD"),
+  //     endDate.format("YYYY-MM-DD")
+  //   );
+
+  //     if (data.length > 0) {
+  //       setEmployeeData(data);
+  //     } else {
+  //       toast.error(
+  //         "No se encontraron datos para los criterios de búsqueda proporcionados."
+  //       );
+  //       setEmployeeData([]);
+  //     }
+  //   } catch (error) {
+  //     toast.error("Error al buscar los datos. Por favor, intente nuevamente.");
+  //     setEmployeeData([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleExport = async () => {
     try {
@@ -76,35 +84,65 @@ export const ReportInfo = () => {
   const generateXLS = async (data) => {
     try {
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Tasks Data", {
-        pageSetup: { paperSize: 9, orientation: "landscape" },
-      });
-
+      const worksheet = workbook.addWorksheet("Reporte Horas Extras");
       worksheet.columns = [
-        { header: "ID", key: "id", width: 15 },
-        { header: "Empleado", key: "name", width: 30 },
-        { header: "Salario", key: "salary", width: 15 },
-        { header: "Cargo", key: "position", width: 30 },
-        { header: "Manager", key: "manager", width: 30 },
-        { header: "Fecha", key: "date", width: 15 },
-        { header: "Diurnas", key: "diurnal", width: 10 },
-        { header: "Nocturnas", key: "nocturnal", width: 10 },
-        { header: "Diurnas Festivas", key: "diurnalHoliday", width: 15 },
-        { header: "Nocturnas Festivas", key: "nocturnalHoliday", width: 15 },
-        { header: "Total Horas Extras", key: "extrasHours", width: 20 },
-        { header: "Observaciones", key: "observations", width: 30 },
-        { header: "Registro", key: "registry", width: 15 },
+        { header: "ID", key: "identification", width: 15 },
+        { header: "Nombre completo", key: "name", width: 30 },
+        { header: "Nombre del incidente", key: "incident", width: 15 },
+        { header: "Observaciones", key: "comments", width: 30 },
+        { header: "Fecha", key: "date", width: 30 },
+        { header: "Hora de inicio", key: "startTime", width: 15 },
+        { header: "Hora de fin", key: "endTime", width: 10 },
+        { header: "Tipo de Hora Extra", key: "extraHourType", width: 10 },
+        { header: "Total Horas Extras", key: "totalExtraHour", width: 10 },
+        { header: "Total a pagar", key: "totalPayment", width: 15 },
       ];
 
-      data.forEach((task) => {
-        worksheet.addRow(task);
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: "FFFFFF" } };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "0070C0" }, 
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
       });
 
-      worksheet.getRow(1).font = { bold: true };
+      data.forEach((task, index) => {
+        const row = worksheet.addRow(task);
+  
+        // Alternar colores en las filas
+        const fillColor = index % 2 === 0 ? "D9E2F3" : "FFFFFF"; // Azul claro y blanco
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: fillColor },
+          };
+          cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" },
+          };
+          cell.alignment = { horizontal: "left", vertical: "middle" };
+        });
+      });
+
+      worksheet.columns.forEach((column) => {
+        const maxLength = column.header.length;
+        column.width = Math.max(column.width, maxLength + 5);
+      });
 
       return workbook.xlsx.writeBuffer();
     } catch (err) {
-      console.log(err);
+      console.error("Error al generar el archivo Excel:", err);
       throw new Error("Error generating XLS file");
     }
   };
@@ -130,7 +168,11 @@ export const ReportInfo = () => {
 
       {error && <p className="error-message">{error}</p>}
 
-      {loading && <p>Cargando datos...</p>}
+      {loading && (
+        <div className="loading-container">
+          <Spin tip="Cargando datos..." />
+        </div>
+      )}
 
       {employeeData.length > 0 && (
         <div className="extra-hours-info">
@@ -138,7 +180,7 @@ export const ReportInfo = () => {
           <Table
             columns={columns}
             dataSource={employeeData}
-            rowKey="registry"
+            rowKey="identification"
             pagination={false}
             scroll={{
               x: 1200,
@@ -147,7 +189,9 @@ export const ReportInfo = () => {
           />
         </div>
       )}
-      <button className="boton" onClick={handleExport}>Exportar a Excel</button>
+      <button className="boton" onClick={handleExport}>
+        Exportar a Excel
+      </button>
     </div>
   );
 };
