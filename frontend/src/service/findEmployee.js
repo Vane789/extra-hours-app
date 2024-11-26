@@ -15,3 +15,18 @@ export const findEmployee = async (employeeId) => {
     throw error;
   }
 };
+
+export const getExtraHoursReport = async () => {
+  const token = localStorage.getItem('token'); 
+  try {
+    const response = await axios.get(`http://localhost:8080/extrahours/report`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener el reporte:', error);
+    throw error;
+  }
+};

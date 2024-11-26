@@ -1,6 +1,7 @@
 package com.example.api_gestion_horas_extra.controllers;
 
 import com.example.api_gestion_horas_extra.dto.ExtraHoursDTO;
+import com.example.api_gestion_horas_extra.dto.ExtraHoursUserDTO;
 import com.example.api_gestion_horas_extra.entity.ExtraHours;
 import com.example.api_gestion_horas_extra.services.ExtraHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +61,11 @@ public class ExtraHoursController {
     public ResponseEntity<Void> deleteExtraHour(@PathVariable Integer id) {
         boolean deleted = extraHoursService.deleteExtraHourById(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<List<ExtraHoursUserDTO>> getExtraHoursReport() {
+        List<ExtraHoursUserDTO> reportData = extraHoursService.generateReport();
+        return ResponseEntity.ok(reportData);
     }
 }
