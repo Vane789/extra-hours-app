@@ -1,5 +1,17 @@
-import { useState } from "react";
-import { Input, Table, DatePicker } from "antd";
+import { useState, useEffect  } from "react";
+import { 
+  Input, 
+  Table, 
+  DatePicker, 
+  Card, 
+  Button, 
+  message 
+} from "antd";
+import { 
+  SearchOutlined, 
+  FileExcelOutlined, 
+  FilterOutlined 
+} from "@ant-design/icons";
 import { getExtraHoursReport } from "@service/findEmployee";
 // import { findExtraHour } from "@service/findExtraHour";
 // import { findExtraHourByDateRange } from "@service/findExtraHourByDateRange";
@@ -13,34 +25,46 @@ const { RangePicker } = DatePicker;
 
 export const ReportInfo = () => {
   const [employeeData, setEmployeeData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedRange, setSelectedRange] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
+  // const [error, setError] = useState(null);
+  // const [selectedRange, setSelectedRange] = useState([]);
 
-  const handleSearch = async () => {
+  useEffect(() => {
+    fetchEmployeeData();
+  }, []);
+
+
+  const fetchEmployeeData  = async () => {
     setLoading(true);
-    setError(null);
-
-    if (!searchValue) {
-      toast.error("Por favor, ingrese un ID válido.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await getExtraHoursReport(searchValue);
+      const response = await getExtraHoursReport(); 
+      
       if (response.length === 0) {
-        toast.error("No se encontraron registros para este ID.");
-        setEmployeeData([]);
+        message.warning("No se encontraron registros.");
       } else {
         setEmployeeData(response);
+        setFilteredData(response);
       }
     } catch (err) {
-      toast.error("Error al buscar los datos. Por favor, intente nuevamente.");
-      setEmployeeData([]);
+      message.error("Error al cargar los datos iniciales.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+
+    if (value) {
+      const filtered = employeeData.filter(item => 
+        item.identification.toString().toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(employeeData);
     }
   };
   // } else if (selectedRange.length === 2) {
@@ -74,10 +98,10 @@ export const ReportInfo = () => {
       });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "data.xls";
+      link.download = `Reporte_Horas_Extras_${new Date().toISOString().split('T')[0]}.xlsx`;
       link.click();
     } catch (error) {
-      console.error("Error generating XLS file:", error);
+      console.error("Error al exportar el archivo Excel", error);
     }
   };
 
@@ -148,50 +172,57 @@ export const ReportInfo = () => {
   };
 
   return (
-    <div className="ReportInfo">
+    <Card 
+      title="Reporte de Horas Extras" 
+      extra={
+        <Button 
+          type="primary" 
+          icon={<FileExcelOutlined />} 
+          onClick={handleExport}
+          disabled={filteredData.length === 0}
+        >
+          Exportar
+        </Button>
+      }
+      style={{ margin: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+    >
       <div className="filters-container">
-        <div className="search-container">
-          <Input.Search
-            placeholder="Ingrese ID del empleado"
-            onSearch={handleSearch}
-            onChange={(e) => setSearchValue(e.target.value)}
-            value={searchValue}
-          />
-        </div>
-        <div className="range-picker-container">
-          <RangePicker onChange={(dates) => setSelectedRange(dates)} />
-          <button onClick={handleSearch} style={{ marginLeft: 10 }}>
-            Buscar
-          </button>
-        </div>
+        <Input.Search
+          prefix={<SearchOutlined />}
+          placeholder="Buscar por ID de empleado"
+          value={searchValue}
+          onChange={handleSearchChange}
+          style={{ width: 250, marginRight: 10 }}
+        />
+        
+        {/* <RangePicker 
+          onChange={handleDateRangeChange}
+          style={{ marginRight: 10 }}
+        /> */}
+        
+        <Button 
+          icon={<FilterOutlined />} 
+          onClick={fetchEmployeeData}
+        >
+          Recargar
+        </Button>
       </div>
 
-      {error && <p className="error-message">{error}</p>}
-
-      {loading && (
-        <div className="loading-container">
-          <Spin tip="Cargando datos..." />
-        </div>
-      )}
-
-      {employeeData.length > 0 && (
-        <div className="extra-hours-info">
-          <h3>Registros de Horas Extras</h3>
-          <Table
-            columns={columns}
-            dataSource={employeeData}
-            rowKey="identification"
-            pagination={false}
-            scroll={{
-              x: 1200,
-              y: 800,
-            }}
-          />
-        </div>
-      )}
-      <button className="boton" onClick={handleExport}>
-        Exportar a Excel
-      </button>
-    </div>
+      <Table 
+        columns={columns}
+        dataSource={filteredData}
+        rowKey="identification"
+        loading={loading}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          defaultPageSize: 10,
+          pageSizeOptions: [10, 20, 50, 100],
+          showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} registros`
+        }}
+        scroll={{ x: 1200, y: 500 }}
+        style={{ marginTop: 20 }}
+      />
+    </Card>
   );
 };
