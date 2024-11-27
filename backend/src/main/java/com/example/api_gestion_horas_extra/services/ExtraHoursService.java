@@ -35,6 +35,7 @@ public class ExtraHoursService {
         List<ExtraHours> extraHoursList = extraHoursRepo.findAll();
         return extraHoursList.stream().map(extraHours -> {
             ExtraHoursUserDTO dto = new ExtraHoursUserDTO();
+            dto.setId(extraHours.getId());
             dto.setIdentification(extraHours.getUsers().getIdentification());
             dto.setName(extraHours.getUsers().getName());
             dto.setIncident(extraHours.getIncident().getDescription());
@@ -45,6 +46,7 @@ public class ExtraHoursService {
             dto.setTotalPayment(extraHours.getTotalpayment());
             dto.setExtraHourType(extraHours.getExtrahourtype().getDescription());
             dto.setComments(extraHours.getComments());
+
 
             return dto;
         }).collect(Collectors.toList());
@@ -109,19 +111,20 @@ public class ExtraHoursService {
         return false;
     }
 
-    public Optional<ExtraHours> updateExtraHour(Integer id, ExtraHours updatedExtraHour) {
-        Optional<ExtraHours> existingExtraHour = extraHoursRepo.findById(id);
+    public Optional<ExtraHours> updateExtraHour(Integer identification, ExtraHoursDTO updatedExtraHour) {
+        Optional<ExtraHours> existingExtraHour = extraHoursRepo.findById(identification);
         if (existingExtraHour.isPresent()) {
             ExtraHours extraHour = existingExtraHour.get();
-            extraHour.setDate(updatedExtraHour.getDate());
-            extraHour.setStartime(updatedExtraHour.getStartime());
-            extraHour.setEndtime(updatedExtraHour.getEndtime());
-            extraHour.setComments(updatedExtraHour.getComments());
-            extraHour.setTotalextrahour(updatedExtraHour.getTotalextrahour());
-            extraHour.setTotalpayment(updatedExtraHour.getTotalpayment());
-            extraHour.setUsers(updatedExtraHour.getUsers());
-            extraHour.setExtrahourtype(updatedExtraHour.getExtrahourtype());
-            extraHour.setIncident(updatedExtraHour.getIncident());
+            extraHour.setComments(Optional.ofNullable(updatedExtraHour.getComments()).orElse(extraHour.getComments()));
+            extraHour.setTotalextrahour(Optional.ofNullable(updatedExtraHour.getTotalextrahour()).orElse(extraHour.getTotalextrahour()));
+            extraHour.setTotalpayment(Optional.ofNullable(updatedExtraHour.getTotalpayment()).orElse(extraHour.getTotalpayment()));
+
+            if (updatedExtraHour.getIncidentId() != null) {
+                Optional<Incidents> incident = incidentsRepo.findById(updatedExtraHour.getIncidentId());
+                incident.ifPresent(extraHour::setIncident);
+            }
+
+
             return Optional.of(extraHoursRepo.save(extraHour));
         }
         return Optional.empty();

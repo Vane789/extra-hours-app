@@ -15,6 +15,6 @@ public class ExtraHoursDTO {
     private BigDecimal totalextrahour;
     private BigDecimal totalpayment;
     private String identification;
-    private Integer incidentId  ;
+    private Integer incidentId;
     private Integer extrahourtype;
 }
