@@ -1,49 +1,127 @@
-import { useState } from "react";
-import { Input, Table, Button, Modal, Form, InputNumber, message } from "antd";
-import { findEmployee } from "@service/findEmployee";
-import { findExtraHour } from "@service/findExtraHour";
+import { useState, useEffect } from "react";
+import {
+  Input,
+  Table,
+  Card,
+  Button,
+  Modal,
+  Form,
+  message,
+  Tooltip,
+} from "antd";
+import {
+  SearchOutlined,
+  // FilterOutlined,
+  EditOutlined,
+  DeleteTwoTone,
+  DeleteOutlined,
+  // ReloadOutlined
+} from "@ant-design/icons";
+import { getExtraHoursReport } from "@service/findEmployee";
+// import { findEmployee } from "@service/findEmployee";
+// import { findExtraHour } from "@service/findExtraHour";
 import { updateExtraHour } from "@service/updateExtraHour";
 import { deleteExtraHour } from "@service/deleteExtraHour";
+// import { getHoursType } from "@service/getHoursType";
+// import { getIncidents } from "@service/getIncidents";
 import { columns as staticColumns } from "@utils/tableColumns";
 import "./UpdateAndDelete.scss";
+import { toast } from "react-toastify";
 
 export const UpdateAndDelete = () => {
   const [employeeData, setEmployeeData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  // const [extraHourTypes, setExtraHourTypes] = useState([]);
+  // const [incidents, setIncidents] = useState([]);
 
-  const handleSearch = async (idOrRegistry) => {
-    const numericIdOrRegistry = parseInt(idOrRegistry, 10);
+  // useEffect(() => {
+  //   const fetchIncidents = async () => {
+  //     try {
+  //       const data = await getIncidents();
+  //       // Agregamos la opción null al inicio del array
+  //       const formattedIncidents = [
+  //         {
+  //           value: '',
+  //           label: 'Sin incidente'
+  //         },
+  //         ...data.map(incident => ({
+  //           value: incident.id.toString(),
+  //           label: incident.description,
+  //         }))
+  //       ];
+  //       console.log("data incidents ----> " , data)
+  //       setIncidents(formattedIncidents);
+  //     } catch (error) {
+  //       console.error("Error al cargar los incidentes", error);
+  //       toast.error("Error al cargar los incidentes");
+  //     }
+  //   };
+
+  //   fetchIncidents();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchHourTypes = async () => {
+  //     try {
+  //       const data = await getHoursType();
+  //       console.log("data ---> " , data)
+  //       const formattedData = data.map(item => ({
+  //         value: item.id.toString(),
+  //         label: `${item.description} (${item.percentage}%)`,
+  //       }));
+  //       console.log("data fetchHourTypes ----> " , data)
+  //       setExtraHourTypes(formattedData);
+  //     } catch (error) {
+  //       console.error("Error al cargar los tipos de horas", error);
+  //     }
+  //   };
+
+  //   fetchHourTypes();
+  // }, []);
+
+  useEffect(() => {
+    fetchEmployeeData();
+  }, []);
+
+  console.log(filteredData, "filteredData");
+
+  const fetchEmployeeData = async () => {
     setLoading(true);
-    setError(null);
-
     try {
-      const employee = await findEmployee(numericIdOrRegistry);
-      const extraHours = await findExtraHour(numericIdOrRegistry, "id");
-
-      if (!extraHours.length) {
-        const extraHourByRegistry = await findExtraHour(
-          numericIdOrRegistry,
-          "registry"
-        );
-        setEmployeeData(
-          extraHourByRegistry.map((extraHour) => ({
-            ...extraHour,
-            ...employee,
-          }))
-        );
+      const response = await getExtraHoursReport();
+      console.log("response ----> ", response);
+      if (response.length === 0) {
+        message.warning("No se encontraron registros.");
       } else {
-        setEmployeeData(
-          extraHours.map((extraHour) => ({ ...extraHour, ...employee }))
-        );
+        setEmployeeData(response);
+        setFilteredData(response);
       }
-    } catch (error) {
-      setError("No se encontraron datos para el ID ingresado.");
-      setEmployeeData([]);
+    } catch (err) {
+      message.error("Error al cargar los datos iniciales.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+
+    if (value) {
+      const filtered = employeeData.filter((item) =>
+        item.identification
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase())
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(employeeData);
     }
   };
 
@@ -52,12 +130,15 @@ export const UpdateAndDelete = () => {
       title: "¿Estás seguro que deseas eliminar este registro?",
       onOk: async () => {
         try {
-          await deleteExtraHour(record.registry);
+          console.log("record ---> ", record);
+          await deleteExtraHour(record.id.toString());
 
           setEmployeeData((prevData) =>
-            prevData.filter((item) => item.registry !== record.registry)
+            prevData.filter((item) => item.id !== record.id)
           );
-
+          setFilteredData((prevData) =>
+            prevData.filter((item) => item.id !== record.id)
+          );
           message.success("Registro eliminado exitosamente");
         } catch (error) {
           message.error("Error al eliminar el registro");
@@ -71,35 +152,32 @@ export const UpdateAndDelete = () => {
     setIsModalVisible(true);
   };
 
+  useEffect(() => {
+    console.log("isModalVisible ---> ", isModalVisible);
+    console.log("selectedRow ---> ", selectedRow);
+  }, [isModalVisible]);
+
   const handleSave = async (values) => {
+    console.log("values ----> handleSave", values);
     try {
       if (!selectedRow) {
         throw new Error("No hay un registro seleccionado para actualizar.");
       }
 
-      const registry = selectedRow.registry;
-
       const updatedValues = {
         ...values,
-        diurnal: Number(values.diurnal),
-        nocturnal: Number(values.nocturnal),
-        diurnalHoliday: Number(values.diurnalHoliday),
-        nocturnalHoliday: Number(values.nocturnalHoliday),
-        extrasHours:
-          Number(values.diurnal) +
-          Number(values.nocturnal) +
-          Number(values.diurnalHoliday) +
-          Number(values.nocturnalHoliday),
       };
 
       console.log("Datos a actualizar:", updatedValues);
 
       const updatedData = employeeData.map((item) =>
-        item.registry === registry ? { ...item, ...updatedValues } : item
+        item.id === values.id ? { ...item, ...updatedValues } : item
       );
-      setEmployeeData(updatedData);
 
-      const response = await updateExtraHour(registry, updatedValues);
+      console.log("updatedData ---> ", updatedData);
+      setEmployeeData(updatedData);
+      setFilteredData(updatedData);
+      const response = await updateExtraHour(values.id, updatedValues);
 
       console.log("Respuesta de la API:", response);
 
@@ -112,116 +190,122 @@ export const UpdateAndDelete = () => {
     }
   };
 
-  const handleFormChange = (changedFields) => {
-    const { diurnal, nocturnal, diurnalHoliday, nocturnalHoliday } =
-      changedFields;
-
-    const totalExtraHours =
-      (diurnal || selectedRow?.diurnal || 0) +
-      (nocturnal || selectedRow?.nocturnal || 0) +
-      (diurnalHoliday || selectedRow?.diurnalHoliday || 0) +
-      (nocturnalHoliday || selectedRow?.nocturnalHoliday || 0);
-
-    setSelectedRow((prev) => ({
-      ...prev,
-      extrasHours: totalExtraHours,
-    }));
-  };
-
   const actionColumn = {
     title: "Acciones",
     key: "actions",
+    align: "center",
     render: (text, record) => (
-      <span>
-        <Button
-          type="link"
-          onClick={() => handleUpdate(record)}
-          style={{ marginRight: 8 }}
-        >
-          Editar
-        </Button>
-        <Button type="link" onClick={() => handleDelete(record)}>
-          Eliminar
-        </Button>
-      </span>
+      <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
+        <Tooltip title="Editar Registro">
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => handleUpdate(record)}
+          />
+        </Tooltip>
+        <Tooltip title="Eliminar Registro">
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          />
+        </Tooltip>
+      </div>
     ),
   };
 
-  const columns = [...staticColumns, actionColumn]; // Combina las columnas
+  const columns = [...staticColumns, actionColumn];
 
   return (
-    <div className="ReportInfo">
-      <div className="search-container">
+    <Card
+      title="Gestión de Horas Extras"
+      style={{ margin: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+    >
+      <div className="filters-container">
         <Input.Search
-          placeholder="Ingrese ID del empleado"
-          onSearch={handleSearch}
+          prefix={<SearchOutlined />}
+          placeholder="Buscar por ID de empleado"
+          value={searchValue}
+          onChange={handleSearch}
+          style={{ width: 250, marginRight: 10 }}
         />
-        {error && <p className="error-message">{error}</p>}
       </div>
 
-      {loading && <p>Cargando datos...</p>}
-
-      {employeeData.length > 0 && (
-        <div className="extra-hours-info">
-          <h3>Registros de Horas Extras</h3>
-          <Table
-            columns={columns}
-            dataSource={employeeData}
-            rowKey="registry"
-            pagination={false}
-            scroll={{
-              x: 900,
-              y: 500,
-            }}
-          />
-        </div>
-      )}
+      <Table
+        columns={columns}
+        dataSource={filteredData}
+        rowKey="identification"
+        loading={loading}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          defaultPageSize: 10,
+          pageSizeOptions: [10, 20, 50, 100],
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} de ${total} registros`,
+        }}
+        scroll={{ x: 1200, y: 500 }}
+        style={{ marginTop: 20 }}
+      />
 
       {isModalVisible && (
         <Modal
+          className="update-modal"
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
           footer={null}
+          title="Actualizar Registro"
+          centered
         >
-          <div className="modal__container">
-            <header>
-              <h2>Actualizar registro</h2>
-            </header>
-            <Form
-              initialValues={selectedRow}
-              onFinish={handleSave}
-              onValuesChange={handleFormChange}
-            >
-              <Form.Item name="diurnal" label="Diurnas">
-                <InputNumber />
-              </Form.Item>
-              <Form.Item name="nocturnal" label="Nocturnas">
-                <InputNumber />
-              </Form.Item>
-              <Form.Item name="diurnalHoliday" label="Diurnas Festivas">
-                <InputNumber />
-              </Form.Item>
-              <Form.Item name="nocturnalHoliday" label="Nocturnas Festivas">
-                <InputNumber />
-              </Form.Item>
-              <Form.Item name="extrasHours" label="Total Horas Extras">
-                <InputNumber value={selectedRow?.extrasHours} disabled />
-              </Form.Item>
-              <Form.Item name="date" label="Date">
-                <Input />
-              </Form.Item>
-              <Form.Item name="observations" label="Observaciones">
-                <Input />
-              </Form.Item>
-              <Form.Item>
-                <Button className="button" type="primary" htmlType="submit">
-                  Guardar
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </Modal>
+          <Form
+            initialValues={selectedRow}
+            onFinish={handleSave}
+            layout="vertical"
+            className="update-modal-form"
+          >
+             <Form.Item 
+          name="id" 
+          label="ID" 
+          className="update-modal-form-item"
+        >
+          <Input disabled />
+        </Form.Item>
+        
+        <Form.Item 
+          name="incident" 
+          label="Incidente" 
+          className="update-modal-form-item"
+        >
+          <Input placeholder="Describa el incidente" />
+        </Form.Item>
+        
+        <Form.Item 
+          name="comments" 
+          label="Observaciones" 
+          className="update-modal-form-item"
+        >
+          <Input.TextArea 
+            rows={3} 
+            placeholder="Comentarios adicionales" 
+          />
+        </Form.Item>
+        
+        <Form.Item className="update-modal-form-button">
+          <Button 
+            type="primary" 
+            htmlType="submit"
+            block
+            icon={<EditOutlined />}
+            size="large"
+          >
+            Guardar Cambios
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
       )}
-    </div>
+    </Card>
   );
 };

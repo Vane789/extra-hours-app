@@ -1,16 +1,18 @@
-import { useState, useEffect  } from "react";
-import { 
-  Input, 
-  Table, 
-  DatePicker, 
-  Card, 
-  Button, 
-  message 
+import { useState, useEffect } from "react";
+import {
+  Input,
+  Table,
+  // DatePicker,
+  Card,
+  Button,
+  message,
+  Modal,
 } from "antd";
-import { 
-  SearchOutlined, 
-  FileExcelOutlined, 
-  FilterOutlined 
+import {
+  SearchOutlined,
+  FileExcelOutlined,
+  FilterOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 import { getExtraHoursReport } from "@service/findEmployee";
 // import { findExtraHour } from "@service/findExtraHour";
@@ -18,29 +20,41 @@ import { getExtraHoursReport } from "@service/findEmployee";
 import ExcelJS from "exceljs";
 import { columns } from "@utils/tableColumns";
 import "./ReportInfo.scss";
-import { toast } from "react-toastify";
-import { Spin } from "antd";
+import axios from "axios";
+// import { toast } from "react-toastify";
+// import { Spin } from "antd";
 
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 export const ReportInfo = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
+  const [email, setEmail] = useState("");
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   // const [error, setError] = useState(null);
   // const [selectedRange, setSelectedRange] = useState([]);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setEmail("");
+  };
 
   useEffect(() => {
     fetchEmployeeData();
   }, []);
 
-
-  const fetchEmployeeData  = async () => {
+  const fetchEmployeeData = async () => {
     setLoading(true);
     try {
-      const response = await getExtraHoursReport(); 
-      
+      const response = await getExtraHoursReport();
+
       if (response.length === 0) {
         message.warning("No se encontraron registros.");
       } else {
@@ -59,8 +73,11 @@ export const ReportInfo = () => {
     setSearchValue(value);
 
     if (value) {
-      const filtered = employeeData.filter(item => 
-        item.identification.toString().toLowerCase().includes(value.toLowerCase())
+      const filtered = employeeData.filter((item) =>
+        item.identification
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase())
       );
       setFilteredData(filtered);
     } else {
@@ -98,10 +115,56 @@ export const ReportInfo = () => {
       });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `Reporte_Horas_Extras_${new Date().toISOString().split('T')[0]}.xlsx`;
+      link.download = `Reporte_Horas_Extras_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
       link.click();
     } catch (error) {
       console.error("Error al exportar el archivo Excel", error);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    const token = localStorage.getItem("token");
+    if (!email) {
+      message.error("Por favor, ingrese un correo electrónico.");
+      return;
+    }
+
+    setLoadingEmail(true);
+
+    try {
+      const fileBuffer = await generateXLS(employeeData);
+      const base64File = btoa(
+        new Uint8Array(fileBuffer).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      );
+
+      const response = await axios.post(
+        "http://localhost:8080/api/send-email",
+        {
+          email,
+          file: base64File,
+        },
+        { 
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        message.success("Correo enviado con éxito.");
+        handleCancel();
+      }
+    } catch (error) {
+      console.error("Error al enviar el correo:", error);
+      message.error("Error al enviar el correo. Intente nuevamente.");
+    } finally {
+      setLoadingEmail(false);
     }
   };
 
@@ -127,7 +190,7 @@ export const ReportInfo = () => {
         cell.fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: "0070C0" }, 
+          fgColor: { argb: "0070C0" },
         };
         cell.alignment = { horizontal: "center", vertical: "middle" };
         cell.border = {
@@ -140,7 +203,7 @@ export const ReportInfo = () => {
 
       data.forEach((task, index) => {
         const row = worksheet.addRow(task);
-  
+
         // Alternar colores en las filas
         const fillColor = index % 2 === 0 ? "D9E2F3" : "FFFFFF"; // Azul claro y blanco
         row.eachCell((cell) => {
@@ -172,19 +235,24 @@ export const ReportInfo = () => {
   };
 
   return (
-    <Card 
-      title="Reporte de Horas Extras" 
+    <Card
+      title="Reporte de Horas Extras"
       extra={
-        <Button 
-          type="primary" 
-          icon={<FileExcelOutlined />} 
-          onClick={handleExport}
-          disabled={filteredData.length === 0}
-        >
-          Exportar
-        </Button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={handleExport}
+            disabled={filteredData.length === 0}
+          >
+            Exportar
+          </Button>
+          <Button type="primary" icon={<MailOutlined />} onClick={showModal}>
+            Enviar por Correo
+          </Button>
+        </div>
       }
-      style={{ margin: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+      style={{ margin: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
     >
       <div className="filters-container">
         <Input.Search
@@ -194,21 +262,18 @@ export const ReportInfo = () => {
           onChange={handleSearchChange}
           style={{ width: 250, marginRight: 10 }}
         />
-        
+
         {/* <RangePicker 
           onChange={handleDateRangeChange}
           style={{ marginRight: 10 }}
         /> */}
-        
-        <Button 
-          icon={<FilterOutlined />} 
-          onClick={fetchEmployeeData}
-        >
+
+        <Button icon={<FilterOutlined />} onClick={fetchEmployeeData}>
           Recargar
         </Button>
       </div>
 
-      <Table 
+      <Table
         columns={columns}
         dataSource={filteredData}
         rowKey="identification"
@@ -218,11 +283,33 @@ export const ReportInfo = () => {
           showQuickJumper: true,
           defaultPageSize: 10,
           pageSizeOptions: [10, 20, 50, 100],
-          showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} registros`
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} de ${total} registros`,
         }}
         scroll={{ x: 1200, y: 500 }}
         style={{ marginTop: 20 }}
       />
+      <Modal
+        title="Enviar Reporte por Correo"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Input
+          placeholder="Ingrese el correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ marginBottom: 15 }}
+        />
+        <Button
+          type="primary"
+          loading={loadingEmail}
+          onClick={handleSendEmail}
+          style={{ width: "100%" }}
+        >
+          Enviar
+        </Button>
+      </Modal>
     </Card>
   );
 };

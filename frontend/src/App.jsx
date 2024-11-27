@@ -8,7 +8,6 @@ import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ApprovePage from "./pages/ApprovePage";
 import AddExtrahour from "./pages/AddExtrahour";
-import PayExtraHoursPage from "./pages/PayExtraHoursPage";
 import DeleteExtrahour from "./pages/DeleteExtrahour";
 import { AuthProvider, AuthContext } from "./components/context/AuthContext";
 import Footer from "./components/common/Footer";
@@ -44,7 +43,6 @@ const routeComponents = {
   "/add": AddExtrahour,
   "/reports": ReportsPage,
   "/approve-payroll": ApprovePage,
-  "/update": PayExtraHoursPage,
   "/delete": DeleteExtrahour,
   "/settings": SettingsPage,
   "/profile": ProfilePage,

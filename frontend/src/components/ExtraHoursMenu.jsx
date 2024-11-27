@@ -63,12 +63,6 @@ const ExtraHoursMenu = () => {
         path: "/approve-payroll",
       },
       {
-        icon: <DollarOutlined />,
-        title: "Pagos",
-        description: "Gestionar pagos de horas extras",
-        path: "/update",
-      },
-      {
         icon: <SettingOutlined />,
         title: "Configuración",
         description: "Ajustes del sistema",
