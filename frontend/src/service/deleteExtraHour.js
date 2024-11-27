@@ -1,26 +1,17 @@
-export const deleteExtraHour = async (registry) => {
+import axios from 'axios';
+
+export const deleteExtraHour = async (id) => {
+  const token = localStorage.getItem('token'); 
+
   try {
-    const options = {
-      method: "DELETE",
+    const response = await axios.delete(`http://localhost:8080/extrahours/${id}`, {
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-    };
-
-    const response = await fetch(
-      `http://localhost:4000/extra-hour/${registry}`,
-      options
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Error al eliminar la hora extra: ${response.statusText}`
-      );
-    }
-
-    return response.json();
+    });
+    return response.data;
   } catch (error) {
-    console.error("Error al eliminar las horas extra:", error);
+    console.error("Error en deleteExtraHour:", error);
     throw error;
   }
 };

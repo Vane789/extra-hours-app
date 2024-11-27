@@ -8,40 +8,106 @@
 //   width: 200px;
 //   padding-left: 10px;
 // }
+@use '@scss/utils/variables' as *;
+@use '@scss/utils/mixins' as *;
 
-.ant-modal {
-  // h2 {
-  //   padding: 0 10px 5px;
-  // }
+.update-modal {
   .ant-modal-content {
-    width: 500px;
-    max-width: 120vw;
-    padding: 20px;
-    background-color: rgb(85, 99, 224);
-  }
+    background-color: $amadeus-light;
+    border-radius: $border-radius;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 24px;
 
-  .ant-form-item {
-    background-color: rgb(14, 26, 99);
-    margin-top: 2px;
-    margin-bottom: 5px;
-    height: 45px;
-    padding: 8px;
-
-    label {
-      color: #f8f2f2;
-    }
-    .ant-input-number {
-      width: 50px;
-      height: 30px;
-      padding: 1px;
+    .ant-modal-title {
+      color: $amadeus-primary;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 16px;
     }
   }
 
-  .button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0;
+  .update-modal-form {
+    &-item {
+      margin-bottom: 16px;
+      
+      .ant-form-item-label {
+        label {
+          color: $amadeus-primary;
+          font-weight: 500;
+        }
+      }
+      
+      .ant-input, 
+      .ant-input-textarea {
+        border-radius: $border-radius;
+        transition: all 0.3s ease;
+        
+        &:focus {
+          border-color: $secondary-color;
+          box-shadow: 0 0 0 2px rgba($secondary-color, 0.2);
+        }
+      }
+    }
+
+    &-button {
+      margin-top: 16px;
+
+      .ant-btn-primary {
+        background-color: $amadeus-primary;
+        border-color: $amadeus-primary;
+        border-radius: $border-radius;
+        transition: all 0.3s ease;
+
+        // &:hover {
+        //   background-color: color.scale($amadeus-primary, $lightness: -10%);
+        //   border-color: color.scale($amadeus-primary, $lightness: -10%);
+        // }
+
+        &:focus {
+          background-color: $amadeus-primary;
+          border-color: $secondary-color;
+        }
+      }
+    }
+  }
+}
+
+// Table Styles
+.extra-hours-table {
+  .ant-table {
+    background-color: $amadeus-light;
+    border-radius: $border-radius;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .ant-table-header {
+    background-color: $amadeus-primary;
+    color: white;
+  }
+
+  .ant-table-row {
+    transition: background-color $transition-speed ease;
+
+    &:hover {
+      background-color: rgba($secondary-color, 0.1);
+    }
+  }
+}
+
+// Search Styles
+.search-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+
+  .ant-input-search {
+    width: 300px;
+    .ant-input {
+      border-color: $amadeus-primary;
+      &:focus {
+        border-color: $secondary-color;
+        box-shadow: 0 0 0 2px rgba($secondary-color, 0.2);
+      }
+    }
   }
 }
