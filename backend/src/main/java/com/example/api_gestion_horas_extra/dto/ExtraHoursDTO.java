@@ -1,5 +1,6 @@
 package com.example.api_gestion_horas_extra.dto;
 
+import com.example.api_gestion_horas_extra.entity.ApprovalStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;

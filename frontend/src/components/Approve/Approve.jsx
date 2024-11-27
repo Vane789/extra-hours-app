@@ -1,139 +1,183 @@
-import { useState } from "react";
-import { Input, Table, Button, Modal, message } from "antd";
-import { findEmployee } from "@service/findEmployee";
-import { findExtraHour } from "@service/findExtraHour";
-import { postExtraHourToJSON } from "@service/postExtraHourToJSON";
-import { deleteExtraHour } from "../../service/deleteExtraHour";
-import { columns as staticColumns } from "@utils/tableColumns";
+import React, { useState, useEffect, useCallback } from "react";
+import { 
+  Input, 
+  Table, 
+  Card, 
+  Button, 
+  message, 
+  Tag,
+  Tooltip
+} from "antd";
+import { 
+  SearchOutlined, 
+  CheckOutlined, 
+  CloseOutlined 
+} from "@ant-design/icons";
+import { getPendingExtraHours, approveOrRejectExtraHour } from "@service/findEmployee";
 import "./Approve.scss";
 
 export const Approve = () => {
-  const [employeeData, setEmployeeData] = useState([]);
+  const [extraHoursData, setExtraHoursData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearch = async (idOrRegistry) => {
-    const numericIdOrRegistry = parseInt(idOrRegistry, 10);
-    setLoading(true);
-    setError(null);
+  const token = localStorage.getItem('authToken');
+  const approverIdentification = localStorage.getItem('identification');
 
+  const handleExtraHoursAction = async (id, action) => {
+    if (!approverIdentification) {
+      alert("No se ha encontrado identificación en el localStorage");
+      return;
+    }
     try {
-      const employee = await findEmployee(numericIdOrRegistry);
-      const extraHours = await findExtraHour(numericIdOrRegistry, "id");
+      const approveRequestDTO = {
+        approverIdentification: approverIdentification,
+        action: action,
+        requestDate: new Date(),
+      };
 
-      if (!extraHours.length) {
-        const extraHourByRegistry = await findExtraHour(
-          numericIdOrRegistry,
-          "registry"
-        );
-        setEmployeeData(
-          extraHourByRegistry.map((extraHour) => ({
-            ...extraHour,
-            ...employee,
-          }))
-        );
-      } else {
-        setEmployeeData(
-          extraHours.map((extraHour) => ({ ...extraHour, ...employee }))
-        );
-      }
+      await approveOrRejectExtraHour(id, approveRequestDTO);
+      message.success(`Horas extra ${action === 'approve' ? 'aprobadas' : 'rechazadas'} con éxito`);
+      fetchExtraHours();
     } catch (error) {
-      setError("No se encontraron datos para el ID ingresado.");
-      setEmployeeData([]);
+      message.error(`Error: ${error.message}`);
+    }
+  };
+    
+
+  const fetchExtraHours = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getPendingExtraHours(token);
+      setExtraHoursData(response);
+      setFilteredData(response);
+    } catch (error) {
+      message.error("Error al cargar las horas extra");
     } finally {
       setLoading(false);
     }
+  }, [token]);
+
+  useEffect(() => {
+    fetchExtraHours();
+  }, [fetchExtraHours]);
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    const filtered = extraHoursData.filter((item) =>
+      item.identification.toString().toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredData(filtered);
   };
 
-  const handleApprove = async (record) => {
-    try {
-      const updatedRecord = {
-        ...record,
-        salary: Number(record.salary),
-        diurnal: Number(record.diurnal),
-        nocturnal: Number(record.nocturnal),
-        diurnalHoliday: Number(record.diurnalHoliday),
-        nocturnalHoliday: Number(record.nocturnalHoliday),
-        extrasHours: Number(record.extrasHours),
-      };
-
-      const response = await postExtraHourToJSON(updatedRecord);
-
-      console.log("Respuesta de la API:", response);
-
-      message.success("Registro aprobado exitosamente");
-    } catch (error) {
-      message.error("Error al aprobar el registro");
-    }
-  };
-
-  const handleDelete = (record) => {
-    Modal.confirm({
-      title: "¿Estás seguro que deseas eliminar este registro?",
-      onOk: async () => {
-        try {
-          await deleteExtraHour(record.registry);
-
-          setEmployeeData((prevData) =>
-            prevData.filter((item) => item.registry !== record.registry)
-          );
-
-          message.success("Registro eliminado exitosamente");
-        } catch (error) {
-          message.error("Error al eliminar el registro");
-        }
-      },
-    });
-  };
-
-  const actionColumn = {
-    title: "Acciones",
-    key: "actions",
-    render: (text, record) => (
-      <span>
-        <Button
-          type="link"
-          onClick={() => handleApprove(record)}
-          style={{ marginRight: 8 }}
+  const columns = [
+    { 
+      title: 'Identificación', 
+      dataIndex: 'identification',
+      width: 120 
+    },
+    { 
+      title: 'Nombre', 
+      dataIndex: 'name',
+      width: 150 
+    },
+    { 
+      title: 'Incidente', 
+      dataIndex: 'incident',
+      width: 100 
+    },
+    { 
+      title: 'Descripción incidente', 
+      dataIndex: 'comments',
+      width: 200 
+    },
+    { 
+      title: 'Fecha', 
+      dataIndex: 'date',
+      width: 100 
+    },
+    { 
+      title: 'Horas Extras', 
+      dataIndex: 'totalExtraHour', 
+      render: (value) => `${value} hrs`,
+      width: 50
+    },
+    { 
+      title: 'Estado', 
+      dataIndex: 'approvalStatus', 
+      render: (status) => (
+        <Tag 
+          color={status === 'PENDING' ? 'orange' : status === 'APPROVED' ? 'green' : 'red'}
         >
-          Aprobar
-        </Button>
-        <Button type="link" onClick={() => handleDelete(record)}>
-          Eliminar
-        </Button>
-      </span>
-    ),
-  };
-
-  const columns = [...staticColumns, actionColumn];
+          {status}
+        </Tag>
+      ),
+      width: 60
+    },
+    {
+      title: 'Acciones',
+      key: 'actions',
+      width: 100,
+      render: (_, record) => (
+        record.approvalStatus === 'PENDING' && (
+          <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
+            <Tooltip title="Aprobar">
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<CheckOutlined />}
+                onClick={() => handleExtraHoursAction(record, 'approve')}
+              />
+            </Tooltip>
+            <Tooltip title="Rechazar">
+              <Button
+                type="primary"
+                shape="circle"
+                danger
+                icon={<CloseOutlined />}
+                onClick={() => handleExtraHoursAction(record, 'reject')}
+              />
+            </Tooltip>
+          </div>
+        )
+      )
+    }
+  ];
 
   return (
-    <div className="Approve">
-      <div className="">
+    <Card
+      title="Aprobación de Horas Extras"
+      style={{ margin: "20px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
+    >
+      <div className="filters-container">
         <Input.Search
-          placeholder="Ingrese ID del empleado"
-          onSearch={handleSearch}
+          prefix={<SearchOutlined />}
+          placeholder="Buscar por ID de empleado"
+          value={searchTerm}
+          onChange={handleSearch}
+          style={{ width: 250, marginRight: 10 }}
         />
-        {error && <p className="error-message">{error}</p>}
       </div>
 
-      {loading && <p>Cargando datos...</p>}
-
-      {employeeData.length > 0 && (
-        <div className="extra-hours-info">
-          <h3>Registros de Horas Extras</h3>
-          <Table
-            columns={columns}
-            dataSource={employeeData}
-            rowKey="registry"
-            pagination={false}
-            scroll={{
-              x: 900,
-              y: 500,
-            }}
-          />
-        </div>
-      )}
-    </div>
+      <Table
+        columns={columns}
+        dataSource={filteredData}
+        rowKey="id"
+        loading={loading}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          defaultPageSize: 10,
+          pageSizeOptions: [10, 20, 50, 100],
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} de ${total} registros`,
+        }}
+        scroll={{ x: 1200, y: 500 }}
+        style={{ marginTop: 20 }}
+      />
+    </Card>
   );
 };

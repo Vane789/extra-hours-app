@@ -39,6 +39,30 @@ public class ExtraHours {
     @Column(name = "totalpayment", precision = 10, scale = 2)
     private BigDecimal totalpayment;
 
+    @Column(name = "approve")
+    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
+
+    @Column(name = "approval_date")
+    private LocalDateTime approvalDate;
+
+    @ManyToOne
+    @JoinColumn(name = "approved_by_user_id")
+    private OurUsers approvedByUser;
+
+    // Método de utilidad para establecer la aprobación
+    public void approve(OurUsers approver) {
+        this.approvalStatus = ApprovalStatus.APPROVED;
+        this.approvalDate = LocalDateTime.now();
+        this.approvedByUser = approver;
+    }
+
+    // Método de utilidad para rechazar
+    public void reject(OurUsers approver) {
+        this.approvalStatus = ApprovalStatus.REJECTED;
+        this.approvalDate = LocalDateTime.now();
+        this.approvedByUser = approver;
+    }
+
     @JsonBackReference(value = "user-extrahours")
     @ManyToOne
     @JoinColumn(name = "employee_id", referencedColumnName = "identification", nullable = false)

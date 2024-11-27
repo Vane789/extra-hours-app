@@ -1,11 +1,9 @@
 package com.example.api_gestion_horas_extra.services;
 
+import com.example.api_gestion_horas_extra.dto.ApproveRequestDTO;
 import com.example.api_gestion_horas_extra.dto.ExtraHoursDTO;
 import com.example.api_gestion_horas_extra.dto.ExtraHoursUserDTO;
-import com.example.api_gestion_horas_extra.entity.ExtraHours;
-import com.example.api_gestion_horas_extra.entity.HourTypes;
-import com.example.api_gestion_horas_extra.entity.Incidents;
-import com.example.api_gestion_horas_extra.entity.OurUsers;
+import com.example.api_gestion_horas_extra.entity.*;
 import com.example.api_gestion_horas_extra.repositories.ExtraHoursRepo;
 import com.example.api_gestion_horas_extra.repositories.HourTypesRepo;
 import com.example.api_gestion_horas_extra.repositories.IncidentsRepo;
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -91,9 +90,17 @@ public class ExtraHoursService {
         return extraHoursRepo.findById(id);
     }
 
-    public List<ExtraHours> getExtraHoursByUserIdentification(String identification) {
-        return extraHoursRepo.findByUsers_Identification(identification);
+    public List<ExtraHoursUserDTO> getExtraHoursUserDTOByUserId(String identification) {
+        Optional<OurUsers> user = usersRepo.findByIdentification(identification);
+        if (user.isPresent()) {
+            List<ExtraHours> extraHoursList = extraHoursRepo.findByUsers_Identification(identification);
+            return extraHoursList.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
+
 
     public List<ExtraHours> getExtraHoursByHourType(Integer hourTypeId) {
         return extraHoursRepo.findByExtrahourtype_Id(hourTypeId);
@@ -129,5 +136,69 @@ public class ExtraHoursService {
         }
         return Optional.empty();
     }
+    public void approveOrRejectExtraHour(Integer extraHourId, ApproveRequestDTO approveRequestDTO) {
+        // Buscar la solicitud de horas extra por su ID
+        ExtraHours extraHours = extraHoursRepo.findById(extraHourId)
+                .orElseThrow(() -> new EntityNotFoundException("Hora extra no encontrada"));
+
+        // Verificar si la acción es aprobar o rechazar
+        if ("approve".equalsIgnoreCase(approveRequestDTO.getAction())) {
+            // Aprobar la solicitud
+            OurUsers approver = usersRepo.findByIdentification(approveRequestDTO.getApproverIdentification())
+                    .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+            extraHours.approve(approver);
+        } else if ("reject".equalsIgnoreCase(approveRequestDTO.getAction())) {
+            // Rechazar la solicitud
+            OurUsers approver = usersRepo.findByIdentification(approveRequestDTO.getApproverIdentification())
+                    .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+            extraHours.reject(approver);
+        } else {
+            throw new IllegalArgumentException("Acción no válida. Debe ser 'approve' o 'reject'.");
+        }
+
+        // Guardar el estado actualizado
+        extraHoursRepo.save(extraHours);
+    }
+
+
+    // Obtener horas extra pendientes
+    public List<ExtraHoursUserDTO> getPendingExtraHours() {
+        List<ExtraHours> extraHoursList = extraHoursRepo.findByApprovalStatus(ApprovalStatus.PENDING);
+        return extraHoursList.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    // Obtener horas extra aprobadas
+    public List<ExtraHoursUserDTO> getApprovedExtraHours() {
+        List<ExtraHours> extraHoursList = extraHoursRepo.findByApprovalStatus(ApprovalStatus.APPROVED);
+        return extraHoursList.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    // Obtener horas extra rechazadas
+    public List<ExtraHoursUserDTO> getRejectedExtraHours() {
+        List<ExtraHours> extraHoursList = extraHoursRepo.findByApprovalStatus(ApprovalStatus.REJECTED);
+        return extraHoursList.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    private ExtraHoursUserDTO convertToDTO(ExtraHours extraHours) {
+        return new ExtraHoursUserDTO(
+                extraHours.getId(),
+                extraHours.getUsers().getIdentification(),
+                extraHours.getUsers().getName(),
+                extraHours.getIncident().getDescription(),
+                extraHours.getDate(),
+                extraHours.getStartime(),
+                extraHours.getEndtime(),
+                extraHours.getTotalextrahour(),
+                extraHours.getTotalpayment(),
+                extraHours.getExtrahourtype().getDescription(),
+                extraHours.getComments(),
+                extraHours.getApprovalStatus(),
+                extraHours.getApprovalDate(),
+                extraHours.getApprovedByUser() != null ? extraHours.getApprovedByUser().getIdentification() : null
+        );
+    }
+
 
 }

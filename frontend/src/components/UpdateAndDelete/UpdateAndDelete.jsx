@@ -13,7 +13,10 @@ import {
   SearchOutlined,
   // FilterOutlined,
   EditOutlined,
+<<<<<<< HEAD
   DeleteTwoTone,
+=======
+>>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
   DeleteOutlined,
   // ReloadOutlined
 } from "@ant-design/icons";
@@ -26,16 +29,21 @@ import { deleteExtraHour } from "@service/deleteExtraHour";
 // import { getIncidents } from "@service/getIncidents";
 import { columns as staticColumns } from "@utils/tableColumns";
 import "./UpdateAndDelete.scss";
+<<<<<<< HEAD
 import { toast } from "react-toastify";
+=======
+// import { toast } from "react-toastify";
+>>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
 
 export const UpdateAndDelete = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+<<<<<<< HEAD
   // const [extraHourTypes, setExtraHourTypes] = useState([]);
   // const [incidents, setIncidents] = useState([]);
 
@@ -84,6 +92,9 @@ export const UpdateAndDelete = () => {
   //   fetchHourTypes();
   // }, []);
 
+=======
+
+>>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
   useEffect(() => {
     fetchEmployeeData();
   }, []);
