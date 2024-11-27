@@ -240,7 +240,6 @@ export const FormExtraHour = () => {
           />
         </div>
       </div>
-<<<<<<< HEAD
       <div className="form-group-horizontal">
         <label>Diurna</label>
         <input
@@ -275,55 +274,6 @@ export const FormExtraHour = () => {
           readOnly
         />
        
-=======
-      <div className="extra-hour-group">
-        <div className="extra-hour-type">
-          <label htmlFor="extraHourType">
-            <h3 className="tittle">Tipo de Hora Extra</h3>
-          </label>
-          <Cascader
-            options={extraHourTypes}
-            onChange={handleExtraHourTypeChange}
-            placeholder="Seleccione el tipo de hora extra"
-          />
-        </div>
-        <div className="form-group-horizontal">
-          <label htmlFor="extrasHours">
-            <h3 className="tittle">Horas Extras</h3>
-          </label>
-          <input
-            type="number"
-            id="extrasHours"
-            name="totalextrahour"
-            value={extraHours.totalextrahour}
-            readOnly
-          />
-        </div>
-        <div className="total-payment">
-          <label htmlFor="totalPayment">
-            <h3 className="tittle">Total a Pagar</h3>
-          </label>
-          <input
-            type="number"
-            id="totalPayment"
-            name="totalpayment"
-            value={extraHours.totalpayment}
-            readOnly
-          />
-        </div>
-      </div>
-      <div className="incidente">
-        <label htmlFor="cascader">
-          <h3 className="tittle">Incidentes</h3></label>
-        <Cascader
-          options={incidents}
-          onChange={handleCascaderChange}
-          placeholder="Seleccione un incidente"
-          allowClear={false}
-          defaultValue={['']}
-          changeOnSelect
-        />
->>>>>>> c7ea2e68bded6d0fdc6f9172b8ba9fdaa8d94093
       </div>
       <div className="observations">
         <label  htmlFor="observations">

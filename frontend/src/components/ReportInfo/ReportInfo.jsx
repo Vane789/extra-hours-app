@@ -1,25 +1,23 @@
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import { 
   Input, 
   Table, 
   DatePicker, 
   Card, 
   Button, 
-  message 
+  message, 
+  Spin 
 } from "antd";
 import { 
   SearchOutlined, 
   FileExcelOutlined, 
-  FilterOutlined 
+  FilterOutlined, 
+  MailOutlined 
 } from "@ant-design/icons";
 import { getExtraHoursReport } from "@service/findEmployee";
-// import { findExtraHour } from "@service/findExtraHour";
-// import { findExtraHourByDateRange } from "@service/findExtraHourByDateRange";
 import ExcelJS from "exceljs";
 import { columns } from "@utils/tableColumns";
 import "./ReportInfo.scss";
-import { toast } from "react-toastify";
-import { Spin } from "antd";
 
 const { RangePicker } = DatePicker;
 
@@ -28,19 +26,15 @@ export const ReportInfo = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
-  // const [error, setError] = useState(null);
-  // const [selectedRange, setSelectedRange] = useState([]);
 
   useEffect(() => {
     fetchEmployeeData();
   }, []);
 
-
-  const fetchEmployeeData  = async () => {
+  const fetchEmployeeData = async () => {
     setLoading(true);
     try {
       const response = await getExtraHoursReport(); 
-      
       if (response.length === 0) {
         message.warning("No se encontraron registros.");
       } else {
@@ -57,7 +51,6 @@ export const ReportInfo = () => {
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
-
     if (value) {
       const filtered = employeeData.filter(item => 
         item.identification.toString().toLowerCase().includes(value.toLowerCase())
@@ -67,28 +60,6 @@ export const ReportInfo = () => {
       setFilteredData(employeeData);
     }
   };
-  // } else if (selectedRange.length === 2) {
-  //   const [startDate, endDate] = selectedRange;
-  //   data = await get(
-  //     startDate.format("YYYY-MM-DD"),
-  //     endDate.format("YYYY-MM-DD")
-  //   );
-
-  //     if (data.length > 0) {
-  //       setEmployeeData(data);
-  //     } else {
-  //       toast.error(
-  //         "No se encontraron datos para los criterios de búsqueda proporcionados."
-  //       );
-  //       setEmployeeData([]);
-  //     }
-  //   } catch (error) {
-  //     toast.error("Error al buscar los datos. Por favor, intente nuevamente.");
-  //     setEmployeeData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleExport = async () => {
     try {
@@ -102,6 +73,33 @@ export const ReportInfo = () => {
       link.click();
     } catch (error) {
       console.error("Error al exportar el archivo Excel", error);
+      message.error("Error al exportar el archivo.");
+    }
+  };
+
+  const handleSendExcel = async () => {
+    try {
+      const xlsBuffer = await generateXLS(employeeData);
+      const blob = new Blob([xlsBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const formData = new FormData();
+      formData.append("file", new File([blob], "Reporte_Horas_Extras.xlsx"));
+
+      const response = await fetch("http://tu-backend.com/api/send-email", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        message.success("Archivo enviado exitosamente.");
+      } else {
+        message.error("Error al enviar el archivo.");
+      }
+    } catch (error) {
+      console.error("Error al enviar el archivo Excel", error);
+      message.error("Error al enviar el archivo.");
     }
   };
 
@@ -127,7 +125,7 @@ export const ReportInfo = () => {
         cell.fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: { argb: "0070C0" }, 
+          fgColor: { argb: "0070C0" },
         };
         cell.alignment = { horizontal: "center", vertical: "middle" };
         cell.border = {
@@ -140,9 +138,7 @@ export const ReportInfo = () => {
 
       data.forEach((task, index) => {
         const row = worksheet.addRow(task);
-  
-        // Alternar colores en las filas
-        const fillColor = index % 2 === 0 ? "D9E2F3" : "FFFFFF"; // Azul claro y blanco
+        const fillColor = index % 2 === 0 ? "D9E2F3" : "FFFFFF";
         row.eachCell((cell) => {
           cell.fill = {
             type: "pattern",
@@ -175,14 +171,24 @@ export const ReportInfo = () => {
     <Card 
       title="Reporte de Horas Extras" 
       extra={
-        <Button 
-          type="primary" 
-          icon={<FileExcelOutlined />} 
-          onClick={handleExport}
-          disabled={filteredData.length === 0}
-        >
-          Exportar
-        </Button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button 
+            type="primary" 
+            icon={<FileExcelOutlined />} 
+            onClick={handleExport}
+            disabled={filteredData.length === 0}
+          >
+            Exportar
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<MailOutlined />} 
+            onClick={handleSendExcel}
+            disabled={filteredData.length === 0}
+          >
+            Enviar
+          </Button>
+        </div>
       }
       style={{ margin: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
     >
@@ -194,12 +200,6 @@ export const ReportInfo = () => {
           onChange={handleSearchChange}
           style={{ width: 250, marginRight: 10 }}
         />
-        
-        {/* <RangePicker 
-          onChange={handleDateRangeChange}
-          style={{ marginRight: 10 }}
-        /> */}
-        
         <Button 
           icon={<FilterOutlined />} 
           onClick={fetchEmployeeData}
