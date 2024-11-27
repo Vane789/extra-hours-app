@@ -1,0 +1,112 @@
+@use '@scss/utils/variables' as *;
+@use '@scss/utils/mixins' as *;
+
+
+.settings-container {
+    background-color: $fondo;
+    min-height: 100vh;
+    padding: 2rem;
+  
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+  
+      @include responsive(md) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+  
+      @include responsive(sm) {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    .settings-card {
+      background-color: white;
+      border-radius: $border-radius;
+      overflow: hidden;
+      @include card-hover;
+  
+      &__icon-container {
+        @include flex-center;
+        background: linear-gradient(135deg, $amadeus-light, $amadeus-secondary);
+        padding: 2rem;
+  
+        .card-icon {
+          font-size: 4rem;
+          color: $amadeus-primary;
+          opacity: 0.7;
+        }
+      }
+  
+      &__content {
+        padding: 1.5rem;
+  
+        &-title {
+          font-size: 1.25rem;
+          color: $primary-color;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+  
+        &-description {
+          color: $amadeus-gray;
+          margin-bottom: 1rem;
+        }
+  
+        &-stats {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 1rem;
+  
+          .stat {
+            text-align: center;
+            
+            &-title {
+              color: $amadeus-gray;
+              font-size: 0.85rem;
+            }
+  
+            &-value {
+              font-weight: bold;
+              font-size: 1.1rem;
+            }
+          }
+        }
+      }
+  
+      &__action-button {
+        width: 100%;
+        background-color: $amadeus-secondary;
+        border-color: $amadeus-secondary;
+        transition: all $transition-speed ease;
+  
+        &:hover {
+          background-color: ($amadeus-secondary, 10%);
+          transform: translateY(-3px);
+        }
+      }
+    }
+  }
+  
+  // Modal Styles
+  .settings-modal {
+    .ant-modal-content {
+      border-radius: $border-radius;
+      box-shadow: 0 10px 30px rgba($amadeus-primary, 0.1);
+    }
+  
+    .ant-form-item-label {
+      font-weight: 500;
+      color: $primary-color;
+    }
+  
+    .ant-btn-primary {
+      background-color: $amadeus-secondary;
+      border-color: $amadeus-secondary;
+  
+      &:hover {
+        background-color: ($amadeus-secondary, 10%);
+      }
+    }
+  }
