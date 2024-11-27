@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { 
   Input, 
   Table, 
@@ -14,7 +13,6 @@ import {
   FileExcelOutlined, 
   FilterOutlined, 
   MailOutlined 
-=======
 import {
   Input,
   Table,
@@ -29,7 +27,6 @@ import {
   FileExcelOutlined,
   FilterOutlined,
   MailOutlined,
->>>>>>> cd0a355 (se agrega funcionalidad)
 } from "@ant-design/icons";
 import { getExtraHoursReport } from "@service/findEmployee";
 import ExcelJS from "exceljs";
