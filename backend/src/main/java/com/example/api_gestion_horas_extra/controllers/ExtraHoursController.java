@@ -51,14 +51,14 @@ public class ExtraHoursController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExtraHours> updateExtraHour(@PathVariable Integer id, @RequestBody ExtraHours updatedExtraHour) {
+    public ResponseEntity<ExtraHours> updateExtraHour(@PathVariable Integer id, @RequestBody ExtraHoursDTO updatedExtraHour) {
         return extraHoursService.updateExtraHour(id, updatedExtraHour)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExtraHour(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteExtraHour(@PathVariable Integer id) {
         boolean deleted = extraHoursService.deleteExtraHourById(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
