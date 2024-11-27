@@ -13,7 +13,6 @@ import {
   SearchOutlined,
   // FilterOutlined,
   EditOutlined,
-  DeleteTwoTone,
   DeleteOutlined,
   // ReloadOutlined
 } from "@ant-design/icons";
@@ -26,63 +25,16 @@ import { deleteExtraHour } from "@service/deleteExtraHour";
 // import { getIncidents } from "@service/getIncidents";
 import { columns as staticColumns } from "@utils/tableColumns";
 import "./UpdateAndDelete.scss";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 export const UpdateAndDelete = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  // const [extraHourTypes, setExtraHourTypes] = useState([]);
-  // const [incidents, setIncidents] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchIncidents = async () => {
-  //     try {
-  //       const data = await getIncidents();
-  //       // Agregamos la opción null al inicio del array
-  //       const formattedIncidents = [
-  //         {
-  //           value: '',
-  //           label: 'Sin incidente'
-  //         },
-  //         ...data.map(incident => ({
-  //           value: incident.id.toString(),
-  //           label: incident.description,
-  //         }))
-  //       ];
-  //       console.log("data incidents ----> " , data)
-  //       setIncidents(formattedIncidents);
-  //     } catch (error) {
-  //       console.error("Error al cargar los incidentes", error);
-  //       toast.error("Error al cargar los incidentes");
-  //     }
-  //   };
-
-  //   fetchIncidents();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchHourTypes = async () => {
-  //     try {
-  //       const data = await getHoursType();
-  //       console.log("data ---> " , data)
-  //       const formattedData = data.map(item => ({
-  //         value: item.id.toString(),
-  //         label: `${item.description} (${item.percentage}%)`,
-  //       }));
-  //       console.log("data fetchHourTypes ----> " , data)
-  //       setExtraHourTypes(formattedData);
-  //     } catch (error) {
-  //       console.error("Error al cargar los tipos de horas", error);
-  //     }
-  //   };
-
-  //   fetchHourTypes();
-  // }, []);
 
   useEffect(() => {
     fetchEmployeeData();

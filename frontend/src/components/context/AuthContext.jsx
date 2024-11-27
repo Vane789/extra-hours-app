@@ -1,8 +1,22 @@
-import { createContext, useState, useEffect } from 'react';
-import UserService from '../service/UserService';
+import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserService from '../service/UserService';
 
 export const AuthContext = createContext();
+
+export const ProtectedRoute = ({ children, roles = [] }) => {
+  const { auth, isAuthenticated } = useContext(AuthContext);
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (roles.length > 0 && !roles.includes(auth.role)) {
+    return <Navigate to="/menu" replace />;
+  }
+
+  return children;
+};
 
 export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState({
@@ -11,6 +25,7 @@ export const AuthProvider = ({ children }) => {
         email: localStorage.getItem('email'),
         identification: localStorage.getItem('identification'),
         salary: localStorage.getItem('salary'),
+        name: localStorage.getItem('name')
     });
     const navigate = useNavigate();
 
@@ -25,11 +40,16 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             setAuth({ token, role, email, name, identification, salary });
         } else {
-            setAuth({ token: null, role: null, email: null, name: null, identification: null, salary: null });
+            setAuth({ 
+                token: null, 
+                role: null, 
+                email: null, 
+                name: null, 
+                identification: null, 
+                salary: null 
+            });
         }
     }, []);
-
-    console.log(auth,"auth");
 
     const isAuthenticated = () => {
         return !!auth.token;
@@ -37,44 +57,29 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            console.log("Intentando login con:", email);
             const userData = await UserService.login(email, password);
-            console.log("Respuesta del servidor:", userData);
 
             if (userData.token) {
-                localStorage.setItem('token', userData.token);
-                localStorage.setItem('role', userData.role);
-                localStorage.setItem('email', email);
-
                 const profile = await UserService.getYourProfile(userData.token);
-                localStorage.setItem('name', profile.name);
-                localStorage.setItem('identification', profile.identification);
-                localStorage.setItem('salary', profile.salary);
-
-                setAuth({ 
-                    token: userData.token, 
-                    role: userData.role, 
+                
+                const authData = {
+                    token: userData.token,
+                    role: userData.role,
                     email: email,
                     name: profile.name,
                     identification: profile.identification,
-                    salary: profile.salary,
-                });
+                    salary: profile.salary
+                };
 
-                console.log("Login exitoso, rol:", userData.role);
+                // Guardar en localStorage
+                Object.entries(authData).forEach(([key, value]) => 
+                    localStorage.setItem(key, value)
+                );
 
-                switch(userData.role) {
-                    case 'ADMIN':
-                        console.log("Redirigiendo a /menu como ADMIN");
-                        navigate('/menu', { replace: true });
-                        break;
-                    case 'USER':
-                        console.log("Redirigiendo a /menu como USER");
-                        navigate('/menu', { replace: true });
-                        break;
-                    default:
-                        console.log("Rol no reconocido:", userData.role);
-                        navigate('/login');
-                }
+                setAuth(authData);
+
+                // Redirigir según el rol
+                navigate('/menu', { replace: true });
             }
         } catch (error) {
             console.error('Error en login:', error);
@@ -83,14 +88,17 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        console.log("Ejecutando logout");
-        localStorage.removeItem("token"); 
+        // Limpiar localStorage
+        ['token', 'role', 'email', 'name', 'identification', 'salary']
+            .forEach(key => localStorage.removeItem(key));
         
         setAuth({ 
             token: null, 
             role: null, 
             email: null,
-            name: null 
+            name: null,
+            identification: null,
+            salary: null
         });
         
         UserService.logout();
@@ -112,4 +120,12 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
+};
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };
