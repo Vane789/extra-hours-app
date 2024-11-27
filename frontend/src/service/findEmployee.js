@@ -84,16 +84,26 @@ export const rejectExtraHours = async () => {
 
 export const approveOrRejectExtraHour = async (id, approveRequestDTO) => {
   const token = localStorage.getItem('token');
+  console.log("ID a enviar:", id); 
+  console.log(approveRequestDTO, "approveRequestDTO");
   try {
-    const response = await axios.post(`http://localhost:8080/extrahours/approve-or-reject/${id}`, approveRequestDTO, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
+
+    const idToSend = typeof id === 'object' ? id.id : id; 
+
+    const response = await axios.post(
+      `http://localhost:8080/extrahours/approve-or-reject/${idToSend}`,
+      approveRequestDTO,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error approving or rejecting extra hour", error);
     throw error;
   }
 };
+
+
