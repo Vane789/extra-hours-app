@@ -13,10 +13,6 @@ import {
   SearchOutlined,
   // FilterOutlined,
   EditOutlined,
-<<<<<<< HEAD
-  DeleteTwoTone,
-=======
->>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
   DeleteOutlined,
   // ReloadOutlined
 } from "@ant-design/icons";
@@ -29,11 +25,7 @@ import { deleteExtraHour } from "@service/deleteExtraHour";
 // import { getIncidents } from "@service/getIncidents";
 import { columns as staticColumns } from "@utils/tableColumns";
 import "./UpdateAndDelete.scss";
-<<<<<<< HEAD
-import { toast } from "react-toastify";
-=======
 // import { toast } from "react-toastify";
->>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
 
 export const UpdateAndDelete = () => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -43,58 +35,7 @@ export const UpdateAndDelete = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-<<<<<<< HEAD
-  // const [extraHourTypes, setExtraHourTypes] = useState([]);
-  // const [incidents, setIncidents] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchIncidents = async () => {
-  //     try {
-  //       const data = await getIncidents();
-  //       // Agregamos la opción null al inicio del array
-  //       const formattedIncidents = [
-  //         {
-  //           value: '',
-  //           label: 'Sin incidente'
-  //         },
-  //         ...data.map(incident => ({
-  //           value: incident.id.toString(),
-  //           label: incident.description,
-  //         }))
-  //       ];
-  //       console.log("data incidents ----> " , data)
-  //       setIncidents(formattedIncidents);
-  //     } catch (error) {
-  //       console.error("Error al cargar los incidentes", error);
-  //       toast.error("Error al cargar los incidentes");
-  //     }
-  //   };
-
-  //   fetchIncidents();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchHourTypes = async () => {
-  //     try {
-  //       const data = await getHoursType();
-  //       console.log("data ---> " , data)
-  //       const formattedData = data.map(item => ({
-  //         value: item.id.toString(),
-  //         label: `${item.description} (${item.percentage}%)`,
-  //       }));
-  //       console.log("data fetchHourTypes ----> " , data)
-  //       setExtraHourTypes(formattedData);
-  //     } catch (error) {
-  //       console.error("Error al cargar los tipos de horas", error);
-  //     }
-  //   };
-
-  //   fetchHourTypes();
-  // }, []);
-
-=======
-
->>>>>>> 4af776b769ecac8ad02516ca906ba2f39244ec1d
   useEffect(() => {
     fetchEmployeeData();
   }, []);

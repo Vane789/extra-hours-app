@@ -240,40 +240,53 @@ export const FormExtraHour = () => {
           />
         </div>
       </div>
-      <div className="form-group-horizontal">
-        <label>Diurna</label>
-        <input
-          type="number"
-          name="diurnal"
-          value={extraHours.diurnal}
-          step="0.01"
-          readOnly
+      <div className="extra-hour-group">
+        <div className="extra-hour-type">
+          <label htmlFor="extraHourType">
+            <h3 className="tittle">Tipo de Hora Extra</h3>
+          </label>
+          <Cascader
+            options={extraHourTypes}
+            onChange={handleExtraHourTypeChange}
+            placeholder="Seleccione el tipo de hora extra"
+          />
+        </div>
+        <div className="form-group-horizontal">
+          <label htmlFor="extrasHours">
+            <h3 className="tittle">Horas Extras</h3>
+          </label>
+          <input
+            type="number"
+            id="extrasHours"
+            name="totalextrahour"
+            value={extraHours.totalextrahour}
+            readOnly
+          />
+        </div>
+        <div className="total-payment">
+          <label htmlFor="totalPayment">
+            <h3 className="tittle">Total a Pagar</h3>
+          </label>
+          <input
+            type="number"
+            id="totalPayment"
+            name="totalpayment"
+            value={extraHours.totalpayment}
+            readOnly
+          />
+        </div>
+      </div>
+      <div className="incidente">
+        <label htmlFor="cascader">
+          <h3 className="tittle">Incidentes</h3></label>
+        <Cascader
+          options={incidents}
+          onChange={handleCascaderChange}
+          placeholder="Seleccione un incidente"
+          allowClear={false}
+          defaultValue={['']}
+          changeOnSelect
         />
-        <label>Nocturna</label>
-        <input
-          type="number"
-          name="nocturnal"
-          value={extraHours.nocturnal}
-          step="0.01"
-          readOnly
-        />
-        <label>Diurna Festiva</label>
-        <input
-          type="number"
-          name="diurnalHoliday"
-          value={extraHours.diurnalHoliday}
-          step="0.01"
-          readOnly
-        />
-        <label>Nocturna Festiva</label>
-        <input
-          type="number"
-          name="nocturnalHoliday"
-          value={extraHours.nocturnalHoliday}
-          step="0.01"
-          readOnly
-        />
-       
       </div>
       <div className="observations">
         <label  htmlFor="observations">
