@@ -108,7 +108,7 @@ export const History = () => {
       },
     },
     {
-      title: "Aprobado Por",
+      title: "Aprobado/Rechazado Por",
       dataIndex: "approvedByUserIdentification",
       key: "approvedByUserIdentification",
       render: (value) => (value ? value : ""),

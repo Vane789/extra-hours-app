@@ -122,8 +122,12 @@ export const FormExtraHour = () => {
     const [startHours, startMinutes] = startTime.split(":").map(Number);
     const [endHours, endMinutes] = endTime.split(":").map(Number);
 
-    const startTotalMinutes = startHours * 60 + startMinutes;
-    const endTotalMinutes = endHours * 60 + endMinutes;
+    let startTotalMinutes = startHours * 60 + startMinutes;
+    let endTotalMinutes = endHours * 60 + endMinutes;
+
+    if (endTotalMinutes < startTotalMinutes) {
+      endTotalMinutes += 24 * 60; 
+    }
 
     const diffMinutes = endTotalMinutes - startTotalMinutes;
     const hours = Math.floor(diffMinutes / 60);
