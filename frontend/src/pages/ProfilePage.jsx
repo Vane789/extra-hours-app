@@ -3,16 +3,17 @@ import { AuthContext } from "../components/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserService from "../components/service/UserService";
 import "./ProfilePage.scss";
-import { Typography } from "antd"; 
-import { toast } from 'react-toastify';
+import { Typography } from "antd";
+import { toast } from "react-toastify";
+import home from "../assets/images/home.png";
 
-const { Title } = Typography; 
+const { Title } = Typography;
 
 const ProfilePage = () => {
   const pageTitle = "Mi Perfil";
-  const { auth } = useContext(AuthContext); 
+  const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     email: auth?.email || "",
     password: "",
@@ -32,7 +33,7 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { password, confirmPassword } = formData;
-    const identification = auth?.identification; 
+    const identification = auth?.identification;
 
     if (password !== confirmPassword) {
       toast.error("Las contraseñas no coinciden");
@@ -41,11 +42,11 @@ const ProfilePage = () => {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem("token");
       const updatedPassword = { password };
 
       await UserService.updatePassword(identification, updatedPassword, token);
-      
+
       toast.success("Contraseña actualizada con éxito.");
       setLoading(false);
     } catch (error) {
@@ -53,10 +54,10 @@ const ProfilePage = () => {
       toast.error("Error al actualizar la contraseña.");
     }
   };
- 
+
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         try {
           const profileData = await UserService.getYourProfile(token);
@@ -74,7 +75,14 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page">
-      <Title level={2} className="title">{pageTitle}</Title>
+      <header className="page__header">
+        <a href="http://localhost:5173/menu">
+          <img className="home" src={home} alt="home" />
+        </a>
+      </header>
+      <Title level={2} className="title">
+        {pageTitle}
+      </Title>
       <form onSubmit={handleSubmit} className="profile-form">
         <div className="form-group">
           <label htmlFor="email">Correo electrónico:</label>
