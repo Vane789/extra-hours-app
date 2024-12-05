@@ -5,7 +5,7 @@ export const findEmployee = async (employeeId) => {
   const token = localStorage.getItem('token'); 
 
   try {
-    const response = await axios.get(`http://localhost:8080/api/v1/admin/users/${employeeId}`, {
+    const response = await axios.get(`https://extra-hours-app.onrender.com/api/v1/admin/users/${employeeId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -20,7 +20,7 @@ export const findEmployee = async (employeeId) => {
 export const getExtraHoursReport = async () => {
   const token = localStorage.getItem('token'); 
   try {
-    const response = await axios.get(`http://localhost:8080/extrahours/report`,{
+    const response = await axios.get(`https://extra-hours-app.onrender.com/extrahours/report`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -35,7 +35,7 @@ export const getExtraHoursReport = async () => {
 export const getPendingExtraHours = async () => {
   const token = localStorage.getItem('token'); 
   try {
-    const response = await axios.get(`http://localhost:8080/extrahours/pending`,{
+    const response = await axios.get(`https://extra-hours-app.onrender.com/extrahours/pending`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -53,7 +53,7 @@ export const getPendingExtraHours = async () => {
 export const approveExtraHours = async () => {
   const token = localStorage.getItem('token'); 
   try {
-    const response = await axios.put(`http://localhost:8080/extrahours/approved`,{
+    const response = await axios.put(`https://extra-hours-app.onrender.com/extrahours/approved`,{
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -69,7 +69,7 @@ export const approveExtraHours = async () => {
 export const rejectExtraHours = async () => {
   const token = localStorage.getItem('token'); 
   try {
-    const response = await axios.put(`http://localhost:8080/extrahours/rejected`,{
+    const response = await axios.put(`https://extra-hours-app.onrender.com/extrahours/rejected`,{
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -91,7 +91,7 @@ export const approveOrRejectExtraHour = async (id, approveRequestDTO) => {
     const idToSend = typeof id === 'object' ? id.id : id; 
 
     const response = await axios.post(
-      `http://localhost:8080/extrahours/approve-or-reject/${idToSend}`,
+      `https://extra-hours-app.onrender.com/extrahours/approve-or-reject/${idToSend}`,
       approveRequestDTO,
       {
         headers: {

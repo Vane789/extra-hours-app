@@ -4,7 +4,7 @@ export const getHoursType = async () => {
   const token = localStorage.getItem('token'); 
 
   try {
-    const response = await axios.get(`http://localhost:8080/hourtypes`, {
+    const response = await axios.get(`https://extra-hours-app.onrender.com/hourtypes`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

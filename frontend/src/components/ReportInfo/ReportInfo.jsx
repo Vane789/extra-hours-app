@@ -143,7 +143,7 @@ export const ReportInfo = () => {
       );
 
       const response = await axios.post(
-        "http://localhost:8080/api/send-email",
+        "https://extra-hours-app.onrender.com/api/send-email",
         {
           email,
           file: base64File,

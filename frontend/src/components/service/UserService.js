@@ -1,7 +1,7 @@
 import axios from "axios";
 
 class UserService {
-    static BASE_URL = "http://localhost:8080/api/v1";
+    static BASE_URL = "https://extra-hours-app.onrender.com/api/v1";
 
     static api = axios.create({
         baseURL: this.BASE_URL,

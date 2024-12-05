@@ -4,7 +4,7 @@ export const deleteExtraHour = async (id) => {
   const token = localStorage.getItem('token'); 
 
   try {
-    const response = await axios.delete(`http://localhost:8080/extrahours/${id}`, {
+    const response = await axios.delete(`https://extra-hours-app.onrender.com/extrahours/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

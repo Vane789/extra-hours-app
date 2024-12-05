@@ -17,7 +17,7 @@ export const History = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8080/extrahours/history?identification=${identification}`,
+        `https://extra-hours-app.onrender.com/extrahours/history?identification=${identification}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ export const History = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:8080/extrahours/${id}`,
+        `https://extra-hours-app.onrender.com/extrahours/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

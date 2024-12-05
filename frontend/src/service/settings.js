@@ -4,7 +4,7 @@ export const addHourType = async (hourType) => {
   const token = localStorage.getItem("token");
   try {
     const response = await axios.post(
-      `http://localhost:8080/hourtypes`,
+      `https://extra-hours-app.onrender.com/hourtypes`,
       hourType,
       {
         headers: {
@@ -24,7 +24,7 @@ export const createIncident  = async (incidentDTO) => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.post(
-        `http://localhost:8080/incidents`,
+        `https://extra-hours-app.onrender.com/incidents`,
         incidentDTO,
         {
           headers: {
@@ -43,7 +43,7 @@ export const createIncident  = async (incidentDTO) => {
 export const registerUser  = async (userData) => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/v1/auth/register`,
+        `https://extra-hours-app.onrender.com/api/v1/auth/register`,
         userData,
         {
           headers: {

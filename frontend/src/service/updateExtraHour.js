@@ -7,7 +7,7 @@ export const updateExtraHour = async (id, values) => {
 
   try {
     const response = await axios.put(
-      `http://localhost:8080/extrahours/${id}`,
+      `https://extra-hours-app.onrender.com/extrahours/${id}`,
       values, 
       {
         headers: {
