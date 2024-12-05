@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "incidents", schema = "amadeusbd")
+@Table(name = "incidents")
 @Data
 @Builder
 @AllArgsConstructor
