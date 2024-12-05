@@ -5,11 +5,7 @@ class UserService {
 
     static api = axios.create({
         baseURL: this.BASE_URL,
-        withCredentials: true,
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': 'https://extra-hours-app.vercel.app'
-        }
+        
     });
 
     static getAuthHeaders(token) {
@@ -19,7 +15,7 @@ class UserService {
     // Métodos de autenticación
     static async login(email, password) {
         try {
-            const response = await UserService.api.post("/auth/login", { email, password });
+            const response = await this.api.post("/auth/login", { email, password });
             return response.data;
         } catch (error) {
             console.error("Error en login:", error.response?.data || error.message);
