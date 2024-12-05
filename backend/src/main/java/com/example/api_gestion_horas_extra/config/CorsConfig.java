@@ -16,7 +16,7 @@ public class CorsConfig {
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("https://extra-hours-app-git-main-vane789s-projects.vercel.app")
+                        .allowedOrigins("https://extra-hours-app.vercel.app")
                         .allowedHeaders("*")
                         .allowedHeaders("Authorization", "*")
                         .allowCredentials(true)
