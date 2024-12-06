@@ -16,10 +16,10 @@ public class CorsConfig {
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("*")
+                        .allowedOrigins("https://extra-hours-app.vercel.app/login")
                         .allowedHeaders("*")
-                        .exposedHeaders("Authorization")
-//                        .allowCredentials(true)
+                        .allowedHeaders("Authorization", "*")
+                        .allowCredentials(true)
                         .maxAge(3600);
             }
         };
