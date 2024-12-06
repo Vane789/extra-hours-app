@@ -14,11 +14,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/api/v1/**")
+                registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedOrigins("https://extra-hours-app.vercel.app")
                         .allowedHeaders("*")
-                        .allowedHeaders("Authorization", "*")
+//                        .allowedHeaders("Authorization", "*")
                         .allowCredentials(true)
                         .maxAge(3600);
             }
