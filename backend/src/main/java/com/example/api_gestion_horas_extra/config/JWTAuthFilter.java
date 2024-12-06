@@ -26,20 +26,21 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     @Autowired
     private OurUserDetailsService ourUserDetailsService;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        response.setHeader("Access-Control-Allow-Origin", "*"); // Cambia "*" por tu dominio si necesitas restringir el acceso
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-        response.setHeader("Access-Control-Max-Age", "3600");
-
+        // Detectar si la solicitud es OPTIONS (preflight)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            // Agregar las cabeceras CORS
+            response.setHeader("Access-Control-Allow-Origin", "*"); // Cambia "*" por tu dominio si lo necesitas
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-method, Access-Control-Request-Headers, Authorization");
+            response.setHeader("Access-Control-Max-Age", "3600");
+            // Responder OK sin pasar por la lógica de seguridad
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
+        // Si no es una solicitud OPTIONS, continuamos con la lógica de autenticación JWT
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String userEmail;
