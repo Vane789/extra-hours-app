@@ -30,29 +30,22 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(request -> {
-                    var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.addAllowedOrigin("https://extra-hours-app.vercel.app");  // Asegúrate de que el origen esté configurado correctamente
-                    config.addAllowedMethod("OPTIONS");  // Asegura que OPTIONS esté habilitado
-                    config.addAllowedMethod("GET");
-                    config.addAllowedMethod("POST");
-                    config.addAllowedHeader("*");
-                    config.setAllowCredentials(true);  // Permite credenciales como cookies
-                    return config;
-                }))
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/auth/**", "/public/**").permitAll()
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(request-> request.requestMatchers("/api/v1/auth/**", "/public/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/user/**").hasAnyAuthority("USER")
+                        .requestMatchers("/manager/**").hasAnyAuthority("MANAGER")
+                        .requestMatchers("/adminuser/**").hasAnyAuthority("ADMIN", "USER")
                         .anyRequest().authenticated())
-                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider()).addFilterBefore(
+                        jwtAuthFilter, UsernamePasswordAuthenticationFilter.class
+                );
         return httpSecurity.build();
     }
-
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
