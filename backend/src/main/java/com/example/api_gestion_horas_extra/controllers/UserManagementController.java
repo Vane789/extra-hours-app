@@ -25,7 +25,6 @@ public class UserManagementController {
         ReqRes response = usersManagementService.register(registrationRequest);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
-    @CrossOrigin(origins = "https://extra-hours-app.vercel.app")
     @PostMapping("/auth/login")
     public ResponseEntity<ReqRes> login(@RequestBody ReqRes loginRequest) {
         ReqRes response = usersManagementService.login(loginRequest);
