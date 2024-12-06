@@ -17,7 +17,7 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedOrigins("https://extra-hours-app.vercel.app")
-                        .allowedHeaders("*")
+                        .allowedHeaders("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
 //                        .allowedHeaders("Authorization", "*")
                         .allowCredentials(true)
                         .maxAge(3600);
