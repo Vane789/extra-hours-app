@@ -5,7 +5,15 @@ class UserService {
 
     static api = axios.create({
         baseURL: this.BASE_URL,
-        
+        withCredentials: true,  // Important for CORS with credentials
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            // If you need to handle preflight requests explicitly
+            'Access-Control-Allow-Origin': 'https://extra-hours-app.vercel.app',
+            'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+            'Access-Control-Allow-Headers': '*'
+        }
     });
 
     static getAuthHeaders(token) {
@@ -15,10 +23,19 @@ class UserService {
     // Métodos de autenticación
     static async login(email, password) {
         try {
-            const response = await this.api.post("/auth/login", { email, password });
+            const response = await this.api.post("/auth/login", { email, password }, {
+                // Additional config for specific request if needed
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             return response.data;
         } catch (error) {
-            console.error("Error en login:", error.response?.data || error.message);
+            console.error("Login Error:", {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
             throw error.response?.data || error.message;
         }
     }
