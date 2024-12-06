@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"https://extra-hours-app.vercel.app", "http://localhost:3000"},
+        allowedHeaders = "*",
+        allowCredentials = "true")
 @RequestMapping("/api/v1")
 public class UserManagementController {
 

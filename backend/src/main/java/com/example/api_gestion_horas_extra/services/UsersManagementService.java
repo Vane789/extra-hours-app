@@ -84,7 +84,7 @@ public class UsersManagementService {
 
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage(e.getMessage());
+            response.setMessage("An error occurred: " + e.getMessage());
         }
         return response;
     }
