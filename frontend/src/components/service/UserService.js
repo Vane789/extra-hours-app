@@ -14,7 +14,7 @@ class UserService {
     // Métodos de autenticación
     static async login(email, password) {
         try {
-            const response = await this.api.post("/auth/login", { email });
+            const response = await this.api.post("/auth/login", { email, password });
             return response.data;
         } catch (error) {
             console.error("Error en login:", error.response?.data || error.message);
