@@ -14,9 +14,9 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**")
+                registry.addMapping("/api/v1/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("https://extra-hours-app.vercel.app")
                         .allowedHeaders("*")
                         .allowedHeaders("Authorization", "*")
                         .allowCredentials(true)
